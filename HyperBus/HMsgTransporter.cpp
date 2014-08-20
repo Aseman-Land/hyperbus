@@ -36,7 +36,7 @@ public:
     QMutex transfare_mutex;
 
     QMutex mutex;
-    QString last_recieved_msg;
+    QByteArray last_recieved_msg;
 
     HMsgMiddleTransfare_prev *prev_obj;
     bool wait;
@@ -61,18 +61,18 @@ HMsgTransporter::HMsgTransporter(const QString &address, quint32 port, QObject *
 
     connect(p->thread, SIGNAL(started()), p->client, SLOT(openSession()));
     connect(p->thread, SIGNAL(finished()), p->client, SLOT(deleteLater()));
-    connect(p->client, SIGNAL(messageRecieved(QString)), p->prev_obj, SLOT(messageRecieved(QString)) );
+    connect(p->client, SIGNAL(messageRecieved(QByteArray)), p->prev_obj, SLOT(messageRecieved(QByteArray)) );
 
     p->client->moveToThread(p->thread);
     p->prev_obj->moveToThread(p->thread);
     p->thread->start();
 }
 
-QString HMsgTransporter::transfare(const QString &msg)
+QByteArray HMsgTransporter::transfare(const QByteArray &msg)
 {
     p->wait = true;
-    QString msg_prv = CLIENT_MSG_PREFIX + msg;
-    QMetaObject::invokeMethod( p->client, "sendMessage", Q_ARG(QString,msg_prv) );
+    QByteArray msg_prv = CLIENT_MSG_PREFIX + msg;
+    QMetaObject::invokeMethod( p->client, "sendMessage", Q_ARG(QByteArray,msg_prv) );
 
     quint64 wait_time = 1;
     while( p->wait )
@@ -82,7 +82,7 @@ QString HMsgTransporter::transfare(const QString &msg)
             wait_time+=10;
     }
 
-    QString res;
+    QByteArray res;
     p->mutex.lock();
     res = p->last_recieved_msg;
     p->mutex.unlock();
@@ -90,13 +90,13 @@ QString HMsgTransporter::transfare(const QString &msg)
     return res;
 }
 
-void HMsgTransporter::messageEvent_prev(const QString &msg)
+void HMsgTransporter::messageEvent_prev(const QByteArray &msg)
 {
-    const QString & res = SERVER_MSG_PREFIX + messageEvent(msg);
-    QMetaObject::invokeMethod( p->client, "sendMessage", Q_ARG(QString,res) );
+    const QByteArray & res = SERVER_MSG_PREFIX + messageEvent(msg);
+    QMetaObject::invokeMethod( p->client, "sendMessage", Q_ARG(QByteArray,res) );
 }
 
-QString HMsgTransporter::messageEvent(const QString &msg)
+QByteArray HMsgTransporter::messageEvent(const QByteArray &msg)
 {
     return msg;
 }
@@ -111,7 +111,7 @@ HMsgTransporter::~HMsgTransporter()
     delete p;
 }
 
-void HMsgMiddleTransfare_prev::messageRecieved(const QString &msg)
+void HMsgMiddleTransfare_prev::messageRecieved(const QByteArray &msg)
 {
     if( msg.left(CLIENT_MSG_PREFIX.size()) == CLIENT_MSG_PREFIX )
     {
@@ -123,8 +123,8 @@ void HMsgMiddleTransfare_prev::messageRecieved(const QString &msg)
     else
     if( msg.left(SERVER_MSG_PREFIX.size()) == SERVER_MSG_PREFIX )
     {
-        QString msg_prv = msg.mid(SERVER_MSG_PREFIX.size());
-        QMetaObject::invokeMethod( p, "messageEvent_prev", Q_ARG(QString,msg_prv) );
+        QByteArray msg_prv = msg.mid(SERVER_MSG_PREFIX.size());
+        QMetaObject::invokeMethod( p, "messageEvent_prev", Q_ARG(QByteArray,msg_prv) );
     }
     else
         qDebug() << "Unknown message recieved.";

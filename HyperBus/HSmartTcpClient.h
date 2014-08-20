@@ -30,17 +30,17 @@ public:
     ~HSmartTcpClient();
 
     void setSession( const QString & ip, quint32 port );
-    QString lastRecievedMessage() const;
+    QByteArray lastRecievedMessage() const;
 
 public slots:
     void openSession();
-    void sendMessage( const QString & msg );
+    void sendMessage(const QByteArray &msg );
 
 signals:
-    void messageRecieved( const QString & res );
+    void messageRecieved( const QByteArray & res );
 
 private slots:
-    void messageRecieved_prev( const QString & res );
+    void messageRecieved_prev(const QByteArray &res );
 
 private:
     HSmartTcpClientPrivate *p;

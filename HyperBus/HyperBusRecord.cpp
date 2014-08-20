@@ -19,17 +19,19 @@
 #include "HyperBusRecord.h"
 #include <iostream>
 
+#include <QChar>
+
 HyperBusRecord::HyperBusRecord()
 {
     offsets.clear();
     offsets << 0;
 }
 
-HyperBusRecord::HyperBusRecord( const QString & record )
+HyperBusRecord::HyperBusRecord( const QByteArray & record )
 {
     offsets.clear();
     offsets << 0;
-    this->FromQString( record );
+    this->FromQByteArray( record );
 }
 
 void HyperBusRecord::operator<<( HyperBusRecord record )
@@ -38,21 +40,21 @@ void HyperBusRecord::operator<<( HyperBusRecord record )
         this->operator <<( record[i] );
 }
 
-void HyperBusRecord::operator<<( const QString & str )
+void HyperBusRecord::operator<<( const QByteArray & str )
 {
     list << this->strToRecord( str );
     offsets << offsets.last() + list.last().size();
 }
 
-void HyperBusRecord::operator<<( const QStringList & list )
+void HyperBusRecord::operator<<( const QList<QByteArray> & list )
 {
     for( int i=0 ; i<list.count() ; i++ )
         this->operator <<( list[i] );
 }
 
-QString HyperBusRecord::operator[]( int index )
+QByteArray HyperBusRecord::operator[]( int index )
 {
-    QString result = list.at(index);
+    QByteArray result = list.at(index);
 
     int cnt = result.size();
     for( int i=0 ; i<cnt ; i++ )
@@ -62,7 +64,7 @@ QString HyperBusRecord::operator[]( int index )
             result.remove(0,1);
             break;
         }
-        if( !result.at(0).isNumber() )
+        if( !QChar(result.at(0)).isNumber() )
         {
             break;
         }
@@ -71,41 +73,41 @@ QString HyperBusRecord::operator[]( int index )
     return result;
 }
 
-QString HyperBusRecord::at( int i )
+QByteArray HyperBusRecord::at( int i )
 {
     return this->operator [](i);
 }
 
-QString HyperBusRecord::last()
+QByteArray HyperBusRecord::last()
 {
     return this->at( this->count()-1 );
 }
 
-QString HyperBusRecord::first()
+QByteArray HyperBusRecord::first()
 {
     return this->at(0);
 }
 
-QString HyperBusRecord::takeLast()
+QByteArray HyperBusRecord::takeLast()
 {
     return this->takeAt( this->count()-1 );
 }
 
-QString HyperBusRecord::takeFirst()
+QByteArray HyperBusRecord::takeFirst()
 {
     return this->takeAt(0);
 }
 
-QStringList HyperBusRecord::mid( int index , int len )
+QList<QByteArray> HyperBusRecord::mid( int index , int len )
 {
-    QStringList res;
+    QList<QByteArray> res;
     for( int i=index ; i<index+len ; i++ )
         res << this->operator [](i);
 
     return res;
 }
 
-QStringList HyperBusRecord::toQStringList()
+QList<QByteArray> HyperBusRecord::toQByteArrayList()
 {
     return this->mid( 0 , this->count() );
 }
@@ -119,14 +121,14 @@ void HyperBusRecord::removeAt( int index )
         offsets[i] -= shift_size;
 }
 
-QString HyperBusRecord::takeAt( int index )
+QByteArray HyperBusRecord::takeAt( int index )
 {
-    QString tmp( this->at(index) );
+    QByteArray tmp( this->at(index) );
     this->removeAt( index );
     return tmp;
 }
 
-void HyperBusRecord::FromQString( const QString & str )
+void HyperBusRecord::FromQByteArray( const QByteArray & str )
 {
     int data_size = str.size();
     bool ok;
@@ -136,7 +138,7 @@ void HyperBusRecord::FromQString( const QString & str )
     {
         if( str[i] == ',' )
         {
-            QString tmp = str.mid( j , i-j );
+            QByteArray tmp = str.mid( j , i-j );
             j += tmp.toInt( &ok );
             offsets << j+ext;
 
@@ -149,9 +151,13 @@ void HyperBusRecord::FromQString( const QString & str )
         list << str.mid( offsets[i] , offsets[i+1]-offsets[i] );
 }
 
-QString HyperBusRecord::toQSting()
+QByteArray HyperBusRecord::toQByteArray()
 {
-    return list.join(QString());
+    QByteArray result;
+    foreach( const QByteArray & ba, list )
+        result += ba;
+
+    return result;
 }
 
 int HyperBusRecord::count()
@@ -176,10 +182,10 @@ void HyperBusRecord::clear()
     offsets << 0;
 }
 
-QString HyperBusRecord::strToRecord( const QString & str )
+QByteArray HyperBusRecord::strToRecord(const QByteArray &str )
 {
     char str_size[13];
-    QString record("0," + str);
+    QByteArray record("0," + str);
     int size;
 
     do

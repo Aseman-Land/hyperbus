@@ -28,8 +28,8 @@ class HSmartTcpServerPrivate
 public:
     HTcpServer *server;
 
-    QHash<QTcpSocket*,QString> send_buffer;
-    QHash<QTcpSocket*,QString> read_buffer;
+    QHash<QTcpSocket*,QByteArray> send_buffer;
+    QHash<QTcpSocket*,QByteArray> read_buffer;
 };
 
 HSmartTcpServer::HSmartTcpServer(QObject *parent) :
@@ -37,7 +37,7 @@ HSmartTcpServer::HSmartTcpServer(QObject *parent) :
 {
     p = new HSmartTcpServerPrivate;
     p->server = new HTcpServer(this);
-    connect( p->server, SIGNAL(messageRecieved(QTcpSocket*,QString)), SLOT(messageRecieved_prev(QTcpSocket*,QString)) );
+    connect( p->server, SIGNAL(messageRecieved(QTcpSocket*,QByteArray)), SLOT(messageRecieved_prev(QTcpSocket*,QByteArray)) );
 }
 
 quint16 HSmartTcpServer::port() const
@@ -50,9 +50,9 @@ bool HSmartTcpServer::openSession(const QString &address, quint32 port)
     return p->server->openSession(address,port);
 }
 
-void HSmartTcpServer::sendMessage(QTcpSocket *socket, const QString &m)
+void HSmartTcpServer::sendMessage(QTcpSocket *socket, const QByteArray &m)
 {
-    QString msg = SMART_LAYER_SEND_MSG_PREFIX + m.mid(0,MAXIMUM_MSG_SIZE);
+    QByteArray msg = SMART_LAYER_SEND_MSG_PREFIX + m.mid(0,MAXIMUM_MSG_SIZE);
     p->send_buffer[socket] = m.mid(MAXIMUM_MSG_SIZE);
     if( p->send_buffer[socket].isEmpty() )
         msg += SMART_LAYER_SEND_MSG_END;
@@ -62,11 +62,11 @@ void HSmartTcpServer::sendMessage(QTcpSocket *socket, const QString &m)
     p->server->sendMessage(socket,msg);
 }
 
-void HSmartTcpServer::messageRecieved_prev(QTcpSocket *socket, const QString &m)
+void HSmartTcpServer::messageRecieved_prev(QTcpSocket *socket, const QByteArray &m)
 {
     if( m.left(SMART_LAYER_SEND_MSG_PREFIX.size()) == SMART_LAYER_SEND_MSG_PREFIX )
     {
-        QString msg = m.mid(SMART_LAYER_SEND_MSG_PREFIX.size());
+        QByteArray msg = m.mid(SMART_LAYER_SEND_MSG_PREFIX.size());
         if( msg.isEmpty() )
             return;
 
@@ -79,7 +79,7 @@ void HSmartTcpServer::messageRecieved_prev(QTcpSocket *socket, const QString &m)
         if( msg.right(SMART_LAYER_SEND_MSG_END.size()) == SMART_LAYER_SEND_MSG_END )
         {
             p->read_buffer[socket] += msg.left(msg.size()-SMART_LAYER_SEND_MSG_END.size());
-            QString tmp = p->read_buffer[socket];
+            QByteArray tmp = p->read_buffer[socket];
             p->read_buffer.remove(socket);
             emit messageRecieved(socket,tmp);
         }
@@ -87,7 +87,7 @@ void HSmartTcpServer::messageRecieved_prev(QTcpSocket *socket, const QString &m)
     else
     if( m.left(SMART_LAYER_NEXT_MSG_PREFIX.size()) == SMART_LAYER_NEXT_MSG_PREFIX )
     {
-        QString msg = m.mid(SMART_LAYER_NEXT_MSG_PREFIX.size());
+        QByteArray msg = m.mid(SMART_LAYER_NEXT_MSG_PREFIX.size());
         Q_UNUSED(msg)
         sendMessage(socket,p->send_buffer[socket]);
     }

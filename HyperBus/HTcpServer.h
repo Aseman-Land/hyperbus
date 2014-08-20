@@ -35,10 +35,10 @@ public:
 
 public slots:
     bool openSession(const QString & address, quint32 port);
-    void sendMessage(QTcpSocket *socket, const QString & msg);
+    void sendMessage(QTcpSocket *socket, const QByteArray & msg);
 
 signals:
-    void messageRecieved(QTcpSocket *socket, const QString & msg);
+    void messageRecieved(QTcpSocket *socket, const QByteArray & msg);
 
 private slots:
     void newConnection();

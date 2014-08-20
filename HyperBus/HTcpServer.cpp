@@ -66,14 +66,14 @@ void HTcpServer::newConnection()
 void HTcpServer::readMessage()
 {
     QTcpSocket *socket = static_cast<QTcpSocket*>(sender());
-    QString msg = QString::fromUtf8(socket->readAll());
+    const QByteArray & msg = socket->readAll();
 
     emit messageRecieved( socket, msg );
 }
 
-void HTcpServer::sendMessage(QTcpSocket *socket , const QString &msg)
+void HTcpServer::sendMessage(QTcpSocket *socket , const QByteArray &msg)
 {
-    socket->write(msg.toUtf8());
+    socket->write(msg);
     socket->flush();
 }
 

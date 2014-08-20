@@ -31,14 +31,14 @@ public:
     ~HMsgTransporter();
 
 public slots:
-    QString transfare( const QString & msg );
+    QByteArray transfare(const QByteArray &msg );
 
 private slots:
     void openSession();
-    void messageEvent_prev( const QString & msg );
+    void messageEvent_prev(const QByteArray &msg );
 
 protected:
-    virtual QString messageEvent( const QString & msg );
+    virtual QByteArray messageEvent(const QByteArray &msg );
 
 private:
     HMsgTransporterPrivate *p;
@@ -54,7 +54,7 @@ private:
     }
 
 public slots:
-    void messageRecieved(const QString &msg);
+    void messageRecieved(const QByteArray &msg);
 
 private:
     HMsgTransporter *p;

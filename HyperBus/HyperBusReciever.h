@@ -68,10 +68,10 @@ public:
     quint64 lastPID() const;
 
 protected:
-    QString sendCommand( const QString & commandName, const QStringList & args );
+    QByteArray sendCommand(const QString &commandName, const QList<QByteArray> &args );
 
-    virtual QString callMessage( const QString & msg );
-    QString messageEvent( const QString & msg );
+    virtual QByteArray callMessage(const QByteArray &msg );
+    QByteArray messageEvent(const QByteArray &msg );
 
 protected:
     HyperBusRecieverPrivate *p;

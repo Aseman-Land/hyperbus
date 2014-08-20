@@ -27,8 +27,8 @@ class HVariantConverterUnit
 {
 public:
     virtual QStringList supportedTypes() const = 0;
-    virtual QString encode( const QVariant & var ) = 0;
-    virtual QVariant decode( const QString & str ) = 0;
+    virtual QByteArray encode( const QVariant & var ) = 0;
+    virtual QVariant decode( const QByteArray & str ) = 0;
 };
 
 #endif // HVARIANTCONVERTERUNIT_H

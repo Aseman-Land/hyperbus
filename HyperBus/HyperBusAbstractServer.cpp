@@ -41,7 +41,7 @@ class HyperBusSendMessageItem
 public:
     QTcpSocket *socket;
     QTcpSocket *caller;
-    QString message;
+    QByteArray message;
 };
 
 class HyperBusAbstractServerPrivate
@@ -65,7 +65,7 @@ HyperBusAbstractServer::HyperBusAbstractServer(const QString &address, quint32 p
     p->server = new HSmartTcpServer( this );
         p->server->openSession(address,port);
 
-    connect( p->server, SIGNAL(messageRecieved(QTcpSocket*,QString)), SLOT(messageRecieved(QTcpSocket*,QString)) );
+    connect( p->server, SIGNAL(messageRecieved(QTcpSocket*,QByteArray)), SLOT(messageRecieved(QTcpSocket*,QByteArray)) );
 }
 
 quint16 HyperBusAbstractServer::port() const
@@ -73,31 +73,31 @@ quint16 HyperBusAbstractServer::port() const
     return p->server->port();
 }
 
-void HyperBusAbstractServer::messageRecieved(QTcpSocket *socket, const QString &msg)
+void HyperBusAbstractServer::messageRecieved(QTcpSocket *socket, const QByteArray &msg)
 {
     if( msg.left(CLIENT_MSG_PREFIX.size()) == CLIENT_MSG_PREFIX )
     {
-        QString msg_prv = msg.mid(CLIENT_MSG_PREFIX.size());
+        QByteArray msg_prv = msg.mid(CLIENT_MSG_PREFIX.size());
         readCall( socket, msg_prv );
     }
     else
     if( msg.left(SERVER_MSG_PREFIX.size()) == SERVER_MSG_PREFIX )
     {
-        QString msg_prv = msg.mid(SERVER_MSG_PREFIX.size());
+        QByteArray msg_prv = msg.mid(SERVER_MSG_PREFIX.size());
         readResult( socket, msg_prv );
     }
     else
         qDebug() << "Unknown message recieved.";
 }
 
-void HyperBusAbstractServer::readResult(QTcpSocket *socket, const QString &msg)
+void HyperBusAbstractServer::readResult(QTcpSocket *socket, const QByteArray &msg)
 {
     connectSocket(socket);
     int index = msg.indexOf(":");
     if( index == -1 )
         return;
 
-    QString msg_prv = msg.mid(index+1);
+    QByteArray msg_prv = msg.mid(index+1);
     quint64 msg_id  = msg.mid(0,index).toULongLong();
     if( !p->pending_calls.contains(msg_id) )
         return;
@@ -116,10 +116,10 @@ void HyperBusAbstractServer::readResult(QTcpSocket *socket, const QString &msg)
         p->send_queues.remove(socket);
 }
 
-void HyperBusAbstractServer::readCall(QTcpSocket *socket, const QString &msg)
+void HyperBusAbstractServer::readCall(QTcpSocket *socket, const QByteArray &msg)
 {
     connectSocket(socket);
-    QStringList args = HyperBusRecord(msg).toQStringList();
+    QList<QByteArray> args = HyperBusRecord(msg).toQByteArrayList();
     if( args.isEmpty() )
         RETURN_READ_CALL_CMD
 
@@ -188,7 +188,7 @@ void HyperBusAbstractServer::readCall(QTcpSocket *socket, const QString &msg)
         }
     }
 
-    QString reserved_res;
+    QByteArray reserved_res;
     if( reservedCall(socket,key,args,&reserved_res) )
     {
         p->server->sendMessage( socket, CLIENT_MSG_PREFIX + reserved_res );
@@ -202,17 +202,17 @@ void HyperBusAbstractServer::readCall(QTcpSocket *socket, const QString &msg)
     if( service->args.count() != args.count() )
         RETURN_READ_CALL_CMD
 
-    args.prepend( service->command_id );
-    args.prepend( QString::number(data->pid()) );
+    args.prepend( service->command_id.toUtf8() );
+    args.prepend( QByteArray::number(data->pid()) );
 
     HyperBusRecord record;
-    foreach( const QString & arg, args )
+    foreach( const QByteArray & arg, args )
         record << arg;
 
     HyperBusSendMessageItem send_item;
         send_item.socket  = service->socket;
         send_item.caller  = socket;
-        send_item.message = SERVER_MSG_PREFIX + QString::number(p->last_id) + ":" + record.toQSting();
+        send_item.message = SERVER_MSG_PREFIX + QByteArray::number(p->last_id) + ":" + record.toQByteArray();
 
     p->send_queues[send_item.socket].append( send_item );
     if( p->send_queues[send_item.socket].count() == 1 )
@@ -277,7 +277,7 @@ void HyperBusAbstractServer::connectSocket(QTcpSocket *socket)
     p->connects.insert(socket);
 }
 
-bool HyperBusAbstractServer::reservedCall(QTcpSocket *socket, const QString &key, const QStringList &args, QString *res)
+bool HyperBusAbstractServer::reservedCall(QTcpSocket *socket, const QString &key, const QList<QByteArray> &args, QByteArray *res)
 {
     Q_UNUSED(socket)
     Q_UNUSED(key)

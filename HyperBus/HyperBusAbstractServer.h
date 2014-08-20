@@ -43,14 +43,14 @@ public:
     virtual HSocketData *data(QTcpSocket *socket) = 0;
 
 private slots:
-    void messageRecieved( QTcpSocket *socket, const QString & msg );
-    void readResult( QTcpSocket *socket, const QString & msg );
-    void readCall( QTcpSocket *socket, const QString & msg );
+    void messageRecieved(QTcpSocket *socket, const QByteArray &msg );
+    void readResult(QTcpSocket *socket, const QByteArray &msg );
+    void readCall(QTcpSocket *socket, const QByteArray &msg );
 
     void socketDestroyed(QObject *obj );
 
 protected:
-    virtual bool reservedCall( QTcpSocket *socket, const QString & key, const QStringList & args, QString *res = 0 ) = 0;
+    virtual bool reservedCall(QTcpSocket *socket, const QString & key, const QList<QByteArray> & args, QByteArray *res = 0 ) = 0;
     virtual const QHash<QString,HyperBusServiceItem*> & services() const = 0;
 
 private:

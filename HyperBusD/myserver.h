@@ -38,7 +38,7 @@ public:
     QString inout_string_call( const QString & a );
 
 protected:
-    bool reservedCall(QTcpSocket *socket, const QString &key, const QStringList &args, QString *res);
+    bool reservedCall(QTcpSocket *socket, const QString &key, const QList<QByteArray> &args, QByteArray *res);
 
 };
 

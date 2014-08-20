@@ -43,10 +43,10 @@ public:
     void setFireWallMode( QTcpSocket *socket, const QString & service, HyperBusGlobals::FireWallMode mode );
     HyperBusGlobals::FireWallMode fireWallMode( QTcpSocket *socket, const QString & service );
 
-    bool registerService(QTcpSocket *socket, const QString & key, const QString &command_id, const QString &ret_type , const QList< QPair<QString,QString> > &args, HyperBusGlobals::PermissionUserType perm);
+    bool registerService(QTcpSocket *socket, const QString &key, const QString &command_id, const QString &ret_type , const QList< QPair<QString,QString> > &args, HyperBusGlobals::PermissionUserType perm);
 
 protected:
-    virtual bool reservedCall( QTcpSocket *socket, const QString & key, const QStringList & args, QString *res = 0 );
+    virtual bool reservedCall( QTcpSocket *socket, const QString & key, const QList<QByteArray> & args, QByteArray *res = 0 );
     virtual const QHash<QString,HyperBusServiceItem*> & services() const;
 
     void connect_socket( QTcpSocket *socket );

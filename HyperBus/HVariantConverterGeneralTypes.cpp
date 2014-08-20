@@ -16,6 +16,25 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define GLOBAL_ENCODE( VTYPE, INPUT ) \
+    QByteArray result; \
+    QBuffer buffer(&result); \
+    buffer.open(QBuffer::WriteOnly); \
+    QDataStream stream(&buffer); \
+    stream << INPUT.value<VTYPE>(); \
+    buffer.close(); \
+    return result;
+
+#define GLOBAL_DECODE( VTYPE, INPUT ) \
+    VTYPE result; \
+    QByteArray data = INPUT; \
+    QBuffer buffer(&data); \
+    buffer.open(QBuffer::ReadOnly); \
+    QDataStream stream(&buffer); \
+    stream >> result; \
+    buffer.close(); \
+    return QVariant::fromValue<VTYPE>(result);
+
 #include "HVariantConverterGeneralTypes.h"
 #include "HVariantConverter.h"
 #include "HyperBusRecord.h"
@@ -29,6 +48,8 @@
 #include <QDate>
 #include <QTime>
 #include <QDateTime>
+#include <QBuffer>
+#include <QDataStream>
 
 bool h_variant_register_default_units();
 bool h_variant_default_units_registered = h_variant_register_default_units();
@@ -43,7 +64,11 @@ bool h_variant_register_default_units()
     HVariantConverter::registerConverterUnit( new HVariantConverterUnitDate );
     HVariantConverter::registerConverterUnit( new HVariantConverterUnitDateTime );
     HVariantConverter::registerConverterUnit( new HVariantConverterUnitFont );
+#ifdef GUI_SUPPORT
     HVariantConverter::registerConverterUnit( new HVariantConverterUnitImage );
+    HVariantConverter::registerConverterUnit( new HVariantConverterUnitPixmap );
+    HVariantConverter::registerConverterUnit( new HVariantConverterUnitBitmap );
+#endif
     HVariantConverter::registerConverterUnit( new HVariantConverterUnitNumber );
     HVariantConverter::registerConverterUnit( new HVariantConverterUnitPoint );
     HVariantConverter::registerConverterUnit( new HVariantConverterUnitSize );
@@ -59,14 +84,14 @@ QStringList HVariantConverterUnitString::supportedTypes() const
     return QStringList() << "QString";
 }
 
-QString HVariantConverterUnitString::encode(const QVariant &var)
+QByteArray HVariantConverterUnitString::encode(const QVariant &var)
 {
-    return var.toString();
+    return var.toString().toUtf8();
 }
 
-QVariant HVariantConverterUnitString::decode(const QString &str)
+QVariant HVariantConverterUnitString::decode(const QByteArray &str)
 {
-    return QVariant(str);
+    return QVariant(QString::fromUtf8(str));
 }
 
 
@@ -75,20 +100,14 @@ QStringList HVariantConverterUnitStringList::supportedTypes() const
     return QStringList() << "QStringList";
 }
 
-QString HVariantConverterUnitStringList::encode(const QVariant &var)
+QByteArray HVariantConverterUnitStringList::encode(const QVariant &var)
 {
-    HyperBusRecord record;
-    const QStringList & list = var.toStringList();
-    foreach( const QString & str, list )
-        record << str;
-
-    return record.toQSting();
+    GLOBAL_ENCODE(QStringList,var)
 }
 
-QVariant HVariantConverterUnitStringList::decode(const QString &str)
+QVariant HVariantConverterUnitStringList::decode(const QByteArray &str)
 {
-    HyperBusRecord record( str );
-    return record.toQStringList();
+    GLOBAL_DECODE(QStringList,str)
 }
 
 #ifdef GUI_SUPPORT
@@ -97,127 +116,45 @@ QStringList HVariantConverterUnitImage::supportedTypes() const
     return QStringList() << "QImage" << "QPixmap" << "QBitmap";
 }
 
-QString HVariantConverterUnitImage::encode(const QVariant &var)
+QByteArray HVariantConverterUnitImage::encode(const QVariant &var)
 {
-    QString pre = QString(var.typeName());
-    QImage img;
-    switch( static_cast<int>(var.type()) )
-    {
-    case QVariant::Image:
-        img = var.value<QImage>();
-        break;
-
-    case QVariant::Bitmap:
-        img = var.value<QBitmap>().toImage();
-        break;
-
-    case QVariant::Pixmap:
-        img = var.value<QPixmap>().toImage();
-        break;
-
-    default:
-        return QString();
-    }
-
-    QString res = QString("%1:%2x%3:").arg(pre).arg(img.width()).arg(img.height());
-
-    int cnt = 0;
-    QString last;
-    for( int i=0 ; i<img.height() ; i++ )
-        for( int j=0 ; j<img.width() ; j++ )
-        {
-            const QString & clr = QByteArray::fromHex(QColor(img.pixel(j,i)).name().mid(1).toLatin1()).toBase64();
-            if( last.isEmpty() )
-            {
-                last = clr;
-                cnt++;
-                continue;
-            }
-            else
-            {
-                if( last == clr )
-                {
-                    cnt++;
-                    continue;
-                }
-                else
-                {
-                    if( cnt != 1 )
-                        res += QString("%1%2:").arg(cnt).arg(last);
-                    else
-                        res += QString("%1:").arg(last);
-
-                    cnt = 0;
-
-                    last = clr;
-                    cnt++;
-                    continue;
-                }
-            }
-        }
-
-    if( !last.isEmpty() )
-        res += QString("%1%2:").arg(cnt).arg(last);
-
-    return res;
+    GLOBAL_ENCODE(QImage,var)
 }
 
-QVariant HVariantConverterUnitImage::decode(const QString &str)
+QVariant HVariantConverterUnitImage::decode(const QByteArray &str)
 {
-    int index = str.indexOf(":");
-    if( index == -1 )
-        return QVariant();
+    GLOBAL_DECODE(QImage,str)
+}
 
-    QString type = str.mid(0,index);
-    QString txt = str.mid(index+1);
-    QImage img;
+QStringList HVariantConverterUnitPixmap::supportedTypes() const
+{
+    return QStringList() << "QPixmap";
+}
 
-    int cnt = -1;
-    while( !txt.isEmpty() )
-    {
-        int index = txt.indexOf(':');
-        QString section = txt.mid(0,index);
+QByteArray HVariantConverterUnitPixmap::encode(const QVariant &var)
+{
+    GLOBAL_ENCODE(QPixmap,var)
+}
 
-        if( cnt == -1 )
-        {
-            img = QImage( section.split("x").first().toInt(), section.split("x").last().toInt() , QImage::Format_ARGB32 );
-            cnt = 0;
-            txt.remove(0,index+1);
-            continue;
-        }
+QVariant HVariantConverterUnitPixmap::decode(const QByteArray &str)
+{
+    GLOBAL_DECODE(QPixmap,str)
+}
 
-        int rpt = section.left( section.size()-4 ).toInt();
-        if( rpt == 0 )
-            rpt = 1;
 
-        QString c_name = QString("#%1").arg( QString(QByteArray::fromBase64(section.right(4).toLatin1()).toHex()).rightJustified(6,'0') );
-        for( int i=0 ; i<rpt ; i++ )
-        {
-            img.setPixel( cnt%img.width(), (int)cnt/img.width(), QColor(c_name).rgb() );
-            cnt++;
-        }
+QStringList HVariantConverterUnitBitmap::supportedTypes() const
+{
+    return QStringList() << "QBitmap";
+}
 
-        txt.remove(0,index+1);
-    }
+QByteArray HVariantConverterUnitBitmap::encode(const QVariant &var)
+{
+    GLOBAL_ENCODE(QBitmap,var)
+}
 
-    int t = QVariant::nameToType(type.toLatin1());
-    switch( t )
-    {
-    case QVariant::Image:
-        return img;
-        break;
-
-    case QVariant::Bitmap:
-        return QPixmap::fromImage(img);
-        break;
-
-    case QVariant::Pixmap:
-        return QPixmap::fromImage(img);
-        break;
-
-    default:
-        return QVariant();
-    }
+QVariant HVariantConverterUnitBitmap::decode(const QByteArray &str)
+{
+    GLOBAL_DECODE(QBitmap,str)
 }
 #endif
 
@@ -227,34 +164,14 @@ QStringList HVariantConverterUnitFont::supportedTypes() const
     return QStringList() << "QFont";
 }
 
-QString HVariantConverterUnitFont::encode(const QVariant &var)
+QByteArray HVariantConverterUnitFont::encode(const QVariant &var)
 {
-    QFont fnt = var.value<QFont>();
-    return QString("%1,%2,%3,%4,%5,%6,%7").arg(fnt.family())
-                                          .arg(fnt.pointSize())
-                                          .arg(fnt.weight())
-                                          .arg((int)fnt.bold())
-                                          .arg((int)fnt.italic())
-                                          .arg((int)fnt.strikeOut())
-                                          .arg((int)fnt.underline());
+    GLOBAL_ENCODE(QFont,var)
 }
 
-QVariant HVariantConverterUnitFont::decode(const QString &str)
+QVariant HVariantConverterUnitFont::decode(const QByteArray &str)
 {
-    const QStringList & list = str.split(",");
-    if( list.count() != 7 )
-        return QFont();
-
-    QFont res;
-        res.setFamily( list.at(0) );
-        res.setPointSize( list.at(1).toInt() );
-        res.setWeight( list.at(2).toInt() );
-        res.setBold( list.at(3).toInt() );
-        res.setItalic( list.at(4).toInt() );
-        res.setStrikeOut( list.at(5).toInt() );
-        res.setUnderline( list.at(6).toInt() );
-
-    return QVariant::fromValue<QFont>(res);
+    GLOBAL_DECODE(QFont,str)
 }
 
 
@@ -263,14 +180,14 @@ QStringList HVariantConverterUnitColor::supportedTypes() const
     return QStringList() << "QColor";
 }
 
-QString HVariantConverterUnitColor::encode(const QVariant &var)
+QByteArray HVariantConverterUnitColor::encode(const QVariant &var)
 {
-    return var.value<QColor>().name();
+    GLOBAL_ENCODE(QColor,var)
 }
 
-QVariant HVariantConverterUnitColor::decode(const QString &str)
+QVariant HVariantConverterUnitColor::decode(const QByteArray &str)
 {
-    return QVariant::fromValue<QColor>(QColor( str ));
+    GLOBAL_DECODE(QColor,str)
 }
 
 
@@ -279,20 +196,14 @@ QStringList HVariantConverterUnitBrush::supportedTypes() const
     return QStringList() << "QBrush";
 }
 
-QString HVariantConverterUnitBrush::encode(const QVariant &var)
+QByteArray HVariantConverterUnitBrush::encode(const QVariant &var)
 {
-    QBrush brsh = var.value<QBrush>();
-    return QString("%1,%2").arg( brsh.color().name(), QString::number(brsh.style()) );
+    GLOBAL_ENCODE(QBrush,var)
 }
 
-QVariant HVariantConverterUnitBrush::decode(const QString &str)
+QVariant HVariantConverterUnitBrush::decode(const QByteArray &str)
 {
-    const QStringList & list = str.split(",",QString::SkipEmptyParts);
-    if( list.count() != 2 )
-        return QBrush();
-
-    QBrush res = QBrush( QColor(list.at(0)), static_cast<Qt::BrushStyle>(list.at(1).toInt()) );
-    return QVariant::fromValue<QBrush>(res);
+    GLOBAL_DECODE(QBrush,str)
 }
 
 
@@ -301,14 +212,14 @@ QStringList HVariantConverterUnitDate::supportedTypes() const
     return QStringList() << "QDate";
 }
 
-QString HVariantConverterUnitDate::encode(const QVariant &var)
+QByteArray HVariantConverterUnitDate::encode(const QVariant &var)
 {
-    return var.value<QDate>().toString();
+    GLOBAL_ENCODE(QDate,var)
 }
 
-QVariant HVariantConverterUnitDate::decode(const QString &str)
+QVariant HVariantConverterUnitDate::decode(const QByteArray &str)
 {
-    return QVariant::fromValue<QDate>(QDate::fromString(str));
+    GLOBAL_DECODE(QDate,str)
 }
 
 
@@ -317,14 +228,14 @@ QStringList HVariantConverterUnitTime::supportedTypes() const
     return QStringList() << "QTime";
 }
 
-QString HVariantConverterUnitTime::encode(const QVariant &var)
+QByteArray HVariantConverterUnitTime::encode(const QVariant &var)
 {
-    return var.value<QTime>().toString();
+    GLOBAL_ENCODE(QTime,var)
 }
 
-QVariant HVariantConverterUnitTime::decode(const QString &str)
+QVariant HVariantConverterUnitTime::decode(const QByteArray &str)
 {
-    return QVariant::fromValue<QTime>(QTime::fromString(str));
+    GLOBAL_DECODE(QTime,str)
 }
 
 
@@ -333,130 +244,110 @@ QStringList HVariantConverterUnitDateTime::supportedTypes() const
     return QStringList() << "QDateTime";
 }
 
-QString HVariantConverterUnitDateTime::encode(const QVariant &var)
+QByteArray HVariantConverterUnitDateTime::encode(const QVariant &var)
 {
-    return var.value<QDateTime>().toString();
+    GLOBAL_ENCODE(QDateTime,var)
 }
 
-QVariant HVariantConverterUnitDateTime::decode(const QString &str)
+QVariant HVariantConverterUnitDateTime::decode(const QByteArray &str)
 {
-    return QVariant::fromValue<QDateTime>( QDateTime::fromString(str) );
+    GLOBAL_DECODE(QDateTime,str)
 }
 
 
 QStringList HVariantConverterUnitSize::supportedTypes() const
 {
-    return QStringList() << "QSize" << "QSizeF";
+    return QStringList() << "QSize";
 }
 
-QString HVariantConverterUnitSize::encode(const QVariant &var)
+QByteArray HVariantConverterUnitSize::encode(const QVariant &var)
 {
-    QString pre = QString(var.typeName());
-    QSizeF size;
-    switch( static_cast<int>(var.type()) )
-    {
-    case QVariant::Size:
-        size = var.toSize();
-        break;
-
-    case QVariant::SizeF:
-        size = var.toSizeF();
-        break;
-
-    default:
-        return QString();
-    }
-
-    return QString("%1:%2x%3").arg(pre).arg(size.width()).arg(size.height());
+    GLOBAL_ENCODE(QSize,var)
 }
 
-QVariant HVariantConverterUnitSize::decode(const QString &str)
+QVariant HVariantConverterUnitSize::decode(const QByteArray &str)
 {
-    int index = str.indexOf(":");
-    if( index == -1 )
-        return QVariant();
+    GLOBAL_DECODE(QSize,str)
+}
 
-    QString type = str.mid(0,index);
-    QString txt = str.mid(index+1);
 
-    const QStringList & list = txt.split("x");
-    if( list.count() != 2 )
-        return QVariant();
+QStringList HVariantConverterUnitSizeF::supportedTypes() const
+{
+    return QStringList() << "QSizeF";
+}
 
-    QSizeF res = QSizeF( list.first().toDouble(), list.last().toDouble() );
+QByteArray HVariantConverterUnitSizeF::encode(const QVariant &var)
+{
+    GLOBAL_ENCODE(QSizeF,var)
+}
 
-    int t = QVariant::nameToType(type.toLatin1());
-    switch( t )
-    {
-    case QVariant::Size:
-        return QVariant::fromValue<QSize>(res.toSize());
-        break;
-
-    case QVariant::SizeF:
-        return QVariant::fromValue<QSizeF>(res);
-        break;
-
-    default:
-        return QVariant();
-    }
+QVariant HVariantConverterUnitSizeF::decode(const QByteArray &str)
+{
+    GLOBAL_DECODE(QSizeF,str)
 }
 
 
 QStringList HVariantConverterUnitPoint::supportedTypes() const
 {
-    return QStringList() << "QPoint" << "QPointF";
+    return QStringList() << "QPoint";
 }
 
-QString HVariantConverterUnitPoint::encode(const QVariant &var)
+QByteArray HVariantConverterUnitPoint::encode(const QVariant &var)
 {
-    QString pre = QString(var.typeName());
-    QPointF point;
-    switch( static_cast<int>(var.type()) )
-    {
-    case QVariant::Point:
-        point = var.toPoint();
-        break;
-
-    case QVariant::PointF:
-        point = var.toPointF();
-        break;
-
-    default:
-        return QString();
-    }
-
-    return QString("%1:%2,%3").arg(pre).arg(point.x()).arg(point.y());
+    GLOBAL_ENCODE(QPoint,var)
 }
 
-QVariant HVariantConverterUnitPoint::decode(const QString &str)
+QVariant HVariantConverterUnitPoint::decode(const QByteArray &str)
 {
-    int index = str.indexOf(":");
-    if( index == -1 )
-        return QVariant();
+    GLOBAL_DECODE(QPoint,str)
+}
 
-    QString type = str.mid(0,index);
-    QString txt = str.mid(index+1);
 
-    const QStringList & list = txt.split(",");
-    if( list.count() != 2 )
-        return QVariant();
+QStringList HVariantConverterUnitPointF::supportedTypes() const
+{
+    return QStringList() << "QPointF";
+}
 
-    QPointF res = QPointF( list.first().toDouble(), list.last().toDouble() );
+QByteArray HVariantConverterUnitPointF::encode(const QVariant &var)
+{
+    GLOBAL_ENCODE(QPointF,var)
+}
 
-    int t = QVariant::nameToType(type.toLatin1());
-    switch( t )
-    {
-    case QVariant::Point:
-        return QVariant::fromValue<QPoint>(res.toPoint());
-        break;
+QVariant HVariantConverterUnitPointF::decode(const QByteArray &str)
+{
+    GLOBAL_DECODE(QPointF,str)
+}
 
-    case QVariant::PointF:
-        return QVariant::fromValue<QPointF>(res);
-        break;
 
-    default:
-        return QVariant();
-    }
+QStringList HVariantConverterUnitRect::supportedTypes() const
+{
+    return QStringList() << "QRect";
+}
+
+QByteArray HVariantConverterUnitRect::encode(const QVariant &var)
+{
+    GLOBAL_ENCODE(QRect,var)
+}
+
+QVariant HVariantConverterUnitRect::decode(const QByteArray &str)
+{
+    GLOBAL_DECODE(QRect,str)
+}
+
+
+QStringList HVariantConverterUnitRectF::supportedTypes() const
+{
+    return QStringList() << "QRectF";
+}
+
+QByteArray HVariantConverterUnitRectF::encode(const QVariant &var)
+{
+    GLOBAL_ENCODE(QRectF,var)
+}
+
+QVariant HVariantConverterUnitRectF::decode(const QByteArray &str)
+{
+    GLOBAL_DECODE(QRectF,str)
 }
 
 
@@ -465,12 +356,12 @@ QStringList HVariantConverterUnitNumber::supportedTypes() const
     return QStringList() << "qulonglong" << "int" << "qlonglong" << "uint" << "double" << "float";
 }
 
-QString HVariantConverterUnitNumber::encode(const QVariant &var)
+QByteArray HVariantConverterUnitNumber::encode(const QVariant &var)
 {
-    return QString::number(var.toReal());
+    return QByteArray::number(var.toDouble());
 }
 
-QVariant HVariantConverterUnitNumber::decode(const QString &str)
+QVariant HVariantConverterUnitNumber::decode(const QByteArray &str)
 {
     return str.toDouble();
 }
@@ -486,7 +377,7 @@ QStringList HVariantConverterUnitPairedList::supportedTypes() const
     return QStringList() << "PairedList" << "QList<QPair<QString,QString> >" << "QList<QPair<QString,QString>>";
 }
 
-QString HVariantConverterUnitPairedList::encode(const QVariant &var)
+QByteArray HVariantConverterUnitPairedList::encode(const QVariant &var)
 {
     const PairedList & list = var.value<PairedList>();
     HyperBusRecord res;
@@ -496,16 +387,16 @@ QString HVariantConverterUnitPairedList::encode(const QVariant &var)
     {
         const QPair<QString,QString> & pair = i.next();
         HyperBusRecord pair_record;
-            pair_record << pair.first;
-            pair_record << pair.second;
+            pair_record << pair.first.toUtf8();
+            pair_record << pair.second.toUtf8();
 
-        res << pair_record.toQSting();
+        res << pair_record.toQByteArray();
     }
 
-    return res.toQSting();
+    return res.toQByteArray();
 }
 
-QVariant HVariantConverterUnitPairedList::decode(const QString &str)
+QVariant HVariantConverterUnitPairedList::decode(const QByteArray &str)
 {
     PairedList res;
 

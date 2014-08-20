@@ -155,7 +155,7 @@ HyperBusGlobals::FireWallMode HyperBusServer::fireWallMode(QTcpSocket *socket, c
     return item->firewall_mode;
 }
 
-bool HyperBusServer::reservedCall(QTcpSocket *socket, const QString &key, const QStringList &args, QString *res)
+bool HyperBusServer::reservedCall(QTcpSocket *socket, const QString &key, const QList<QByteArray> &args, QByteArray *res)
 {
     connect_socket(socket);
     if( !getAccess(socket) )
@@ -163,15 +163,15 @@ bool HyperBusServer::reservedCall(QTcpSocket *socket, const QString &key, const 
 
     HSocketData *data = this->data(socket);
 
-    QString res_str;
+    QByteArray res_str;
     if( key == "/register" && args.count() == 4 )
     {
         const QString & key = QString(data->userName().isEmpty()?"/%1%2":"/%1@%2").arg(data->userName(),data->address()) + args.at(0);
-        const QString & cid = args.at(1);
-        const QString & ret = args.at(2);
+        const QByteArray & cid = args.at(1);
+        const QByteArray & ret = args.at(2);
         const PairedList & vals = HVariantConverter::decode(args.at(3)).value<PairedList>();
 
-        res_str = QString::number(registerService( socket, key, cid, ret, vals, HyperBusGlobals::LocalUsers ));
+        res_str = QByteArray::number(registerService( socket, key, cid, ret, vals, HyperBusGlobals::LocalUsers ));
     }
     else
     if( key == "/registerGlobal" && args.count() == 4 )
@@ -180,11 +180,11 @@ bool HyperBusServer::reservedCall(QTcpSocket *socket, const QString &key, const 
             return true;
 
         const QString & key = QString("/global") + args.at(0);
-        const QString & cid = args.at(1);
-        const QString & ret = args.at(2);
+        const QByteArray & cid = args.at(1);
+        const QByteArray & ret = args.at(2);
         const PairedList & vals = HVariantConverter::decode(args.at(3)).value<PairedList>();
 
-        res_str = QString::number(registerService( socket, key, cid, ret, vals, HyperBusGlobals::PublicUsers ));
+        res_str = QByteArray::number(registerService( socket, key, cid, ret, vals, HyperBusGlobals::PublicUsers ));
     }
     else
     if( key == "/registerLocal" && args.count() == 4 )
@@ -193,68 +193,68 @@ bool HyperBusServer::reservedCall(QTcpSocket *socket, const QString &key, const 
             return true;
 
         const QString & key = QString("/local") + args.at(0);
-        const QString & cid = args.at(1);
-        const QString & ret = args.at(2);
+        const QByteArray & cid = args.at(1);
+        const QByteArray & ret = args.at(2);
         const PairedList & vals = HVariantConverter::decode(args.at(3)).value<PairedList>();
 
-        res_str = QString::number(registerService( socket, key, cid, ret, vals, HyperBusGlobals::LocalUsers ));
+        res_str = QByteArray::number(registerService( socket, key, cid, ret, vals, HyperBusGlobals::LocalUsers ));
     }
     else
     if( key == "/registerShare" && args.count() == 4 )
     {
         const QString & key = QString("/share") + args.at(0);
-        const QString & cid = args.at(1);
-        const QString & ret = args.at(2);
+        const QByteArray & cid = args.at(1);
+        const QByteArray & ret = args.at(2);
         const PairedList & vals = HVariantConverter::decode(args.at(3)).value<PairedList>();
 
-        res_str = QString::number(registerService( socket, key, cid, ret, vals, HyperBusGlobals::PublicUsers ));
+        res_str = QByteArray::number(registerService( socket, key, cid, ret, vals, HyperBusGlobals::PublicUsers ));
     }
     else
     if( key == "/setServicePermission" && args.count() == 2 )
     {
-        const QString & service = args.at(0);
+        const QByteArray & service = args.at(0);
         HyperBusGlobals::PermissionUserType user = static_cast<HyperBusGlobals::PermissionUserType>(args.at(1).toInt());
         setServicePermission( socket, service, user );
     }
     else
     if( key == "/servicePermission" && args.count() == 1 )
     {
-        const QString & service = args.at(0);
-        res_str = QString::number( static_cast<int>(servicePermission(service)) );
+        const QByteArray & service = args.at(0);
+        res_str = QByteArray::number( static_cast<int>(servicePermission(service)) );
     }
     else
     if( key == "/addPidToFirewall" && args.count() == 2 )
     {
-        const QString & service = args.at(0);
-        const QString & exe_path = args.at(1);
+        const QByteArray & service = args.at(0);
+        const QByteArray & exe_path = args.at(1);
         addPidToFirewall( socket, service, exe_path );
     }
     else
     if( key == "/removePidFromFirewall" && args.count() == 2 )
     {
-        const QString & service = args.at(0);
-        const QString & exe_path = args.at(1);
+        const QByteArray & service = args.at(0);
+        const QByteArray & exe_path = args.at(1);
         removePidFromFirewall( socket, service, exe_path );
     }
     else
     if( key == "/firewallContaintsPid" && args.count() == 2 )
     {
-        const QString & service = args.at(0);
-        const QString & exe_path = args.at(1);
-        res_str = QString::number( static_cast<int>(firewallContaintsPid(socket, service, exe_path)) );
+        const QByteArray & service = args.at(0);
+        const QByteArray & exe_path = args.at(1);
+        res_str = QByteArray::number( static_cast<int>(firewallContaintsPid(socket, service, exe_path)) );
     }
     else
     if( key == "/setFireWallMode" && args.count() == 2 )
     {
-        const QString & service = args.at(0);
+        const QByteArray & service = args.at(0);
         HyperBusGlobals::FireWallMode mode = static_cast<HyperBusGlobals::FireWallMode>(args.at(1).toInt());
         setFireWallMode( socket, service, mode );
     }
     else
     if( key == "/fireWallMode" && args.count() == 1 )
     {
-        const QString & service = args.at(0);
-        res_str = QString::number( static_cast<int>(fireWallMode(socket, service)) );
+        const QByteArray & service = args.at(0);
+        res_str = QByteArray::number( static_cast<int>(fireWallMode(socket, service)) );
     }
     else
         return false;

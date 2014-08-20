@@ -78,7 +78,7 @@ QString MyServer::inout_string_call(const QString &)
     return QString();
 }
 
-bool MyServer::reservedCall(QTcpSocket *socket, const QString &key, const QStringList &args, QString *res)
+bool MyServer::reservedCall(QTcpSocket *socket, const QString &key, const QList<QByteArray> &args, QByteArray *res)
 {
     return HyperBusServer::reservedCall(socket,key,args,res);
 }

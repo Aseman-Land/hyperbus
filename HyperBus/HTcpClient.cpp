@@ -34,7 +34,7 @@ public:
     QString ip;
     quint32 port;
 
-    QString last_recieved_msg;
+    QByteArray last_recieved_msg;
 
     QHash<QTcpSocket*,QString> buffer;
 };
@@ -56,7 +56,7 @@ void HTcpClient::setSession(const QString &ip, quint32 port)
     p->port = port;
 }
 
-QString HTcpClient::lastRecievedMessage() const
+QByteArray HTcpClient::lastRecievedMessage() const
 {
     return p->last_recieved_msg;
 }
@@ -68,15 +68,15 @@ void HTcpClient::openSession()
     p->tcpSocket->waitForConnected();
 }
 
-void HTcpClient::sendMessage(const QString &msg)
+void HTcpClient::sendMessage(const QByteArray &msg)
 {
-    p->tcpSocket->write(msg.toUtf8());
+    p->tcpSocket->write(msg);
     p->tcpSocket->flush();
 }
 
 void HTcpClient::readMessage()
 {
-    QString msg = QString::fromUtf8(p->tcpSocket->readAll());
+    const QByteArray & msg = p->tcpSocket->readAll();
 
     p->last_recieved_msg = msg;
     emit messageRecieved( msg );

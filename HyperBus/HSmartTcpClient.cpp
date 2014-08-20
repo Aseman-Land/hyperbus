@@ -27,8 +27,8 @@ class HSmartTcpClientPrivate
 public:
     HTcpClient *client;
 
-    QString send_buffer;
-    QString read_buffer;
+    QByteArray send_buffer;
+    QByteArray read_buffer;
 };
 
 HSmartTcpClient::HSmartTcpClient(QObject *parent) :
@@ -36,7 +36,7 @@ HSmartTcpClient::HSmartTcpClient(QObject *parent) :
 {
     p = new HSmartTcpClientPrivate;
     p->client = new HTcpClient(this);
-    connect( p->client, SIGNAL(messageRecieved(QString)), SLOT(messageRecieved_prev(QString)) );
+    connect( p->client, SIGNAL(messageRecieved(QByteArray)), SLOT(messageRecieved_prev(QByteArray)) );
 }
 
 void HSmartTcpClient::setSession(const QString &ip, quint32 port)
@@ -44,7 +44,7 @@ void HSmartTcpClient::setSession(const QString &ip, quint32 port)
     p->client->setSession(ip,port);
 }
 
-QString HSmartTcpClient::lastRecievedMessage() const
+QByteArray HSmartTcpClient::lastRecievedMessage() const
 {
     return p->client->lastRecievedMessage();
 }
@@ -54,9 +54,9 @@ void HSmartTcpClient::openSession()
     p->client->openSession();
 }
 
-void HSmartTcpClient::sendMessage(const QString &m)
+void HSmartTcpClient::sendMessage(const QByteArray &m)
 {
-    QString msg = SMART_LAYER_SEND_MSG_PREFIX + m.mid(0,MAXIMUM_MSG_SIZE);
+    QByteArray msg = SMART_LAYER_SEND_MSG_PREFIX + m.mid(0,MAXIMUM_MSG_SIZE);
     p->send_buffer = m.mid(MAXIMUM_MSG_SIZE);
     if( p->send_buffer.isEmpty() )
         msg += SMART_LAYER_SEND_MSG_END;
@@ -66,11 +66,11 @@ void HSmartTcpClient::sendMessage(const QString &m)
     p->client->sendMessage(msg);
 }
 
-void HSmartTcpClient::messageRecieved_prev(const QString &m)
+void HSmartTcpClient::messageRecieved_prev(const QByteArray &m)
 {
     if( m.left(SMART_LAYER_SEND_MSG_PREFIX.size()) == SMART_LAYER_SEND_MSG_PREFIX )
     {
-        QString msg = m.mid(SMART_LAYER_SEND_MSG_PREFIX.size());
+        QByteArray msg = m.mid(SMART_LAYER_SEND_MSG_PREFIX.size());
         if( msg.isEmpty() )
             return;
 
@@ -83,7 +83,7 @@ void HSmartTcpClient::messageRecieved_prev(const QString &m)
         if( msg.right(SMART_LAYER_SEND_MSG_END.size()) == SMART_LAYER_SEND_MSG_END )
         {
             p->read_buffer += msg.left(msg.size()-SMART_LAYER_SEND_MSG_END.size());
-            QString tmp = p->read_buffer;
+            QByteArray tmp = p->read_buffer;
             p->read_buffer.clear();
             emit messageRecieved(tmp);
         }
@@ -91,7 +91,7 @@ void HSmartTcpClient::messageRecieved_prev(const QString &m)
     else
     if( m.left(SMART_LAYER_NEXT_MSG_PREFIX.size()) == SMART_LAYER_NEXT_MSG_PREFIX )
     {
-        QString msg = m.mid(SMART_LAYER_NEXT_MSG_PREFIX.size());
+        QByteArray msg = m.mid(SMART_LAYER_NEXT_MSG_PREFIX.size());
         Q_UNUSED(msg)
         sendMessage(p->send_buffer);
     }

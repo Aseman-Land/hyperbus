@@ -2,4 +2,6 @@ TEMPLATE = subdirs
 CONFIG += ordered
 SUBDIRS =  \
     HyperBus \
-    HyperBusD
+    HyperBusD \
+    Example \
+    Example2

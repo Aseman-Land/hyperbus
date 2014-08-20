@@ -24,22 +24,22 @@
 
 QHash<QString,HVariantConverterUnit*> h_variant_converter_units;
 
-QString HVariantConverter::encode(const QVariant &var)
+QByteArray HVariantConverter::encode(const QVariant &var)
 {
     if( !h_variant_converter_units.contains(var.typeName()) )
-        return QString();
+        return QByteArray();
 
-    return QString(var.typeName()) + ":" + h_variant_converter_units[var.typeName()]->encode(var);
+    return QByteArray(var.typeName()) + ":" + h_variant_converter_units[var.typeName()]->encode(var);
 }
 
-QVariant HVariantConverter::decode(const QString &str)
+QVariant HVariantConverter::decode(const QByteArray &str)
 {
     int index = str.indexOf(":");
     if( index == -1 )
         return QVariant();
 
-    const QString & type = str.mid(0,index);
-    const QString & data = str.mid(index+1);
+    const QByteArray & type = str.mid(0,index);
+    const QByteArray & data = str.mid(index+1);
 
     if( !h_variant_converter_units.contains(type) )
         return QVariant();

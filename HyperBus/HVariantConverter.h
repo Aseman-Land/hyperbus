@@ -25,8 +25,8 @@ class HVariantConverterUnit;
 class HVariantConverter
 {
 public:
-    static QString encode( const QVariant & var );
-    static QVariant decode(const QString & str );
+    static QByteArray encode( const QVariant & var );
+    static QVariant decode(const QByteArray & str );
     static void registerConverterUnit(HVariantConverterUnit *unit );
 };
 

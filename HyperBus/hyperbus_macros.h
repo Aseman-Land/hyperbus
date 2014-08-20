@@ -19,13 +19,13 @@
 #ifndef HYPERBUS_MACROS_H
 #define HYPERBUS_MACROS_H
 
-#define CLIENT_MSG_PREFIX QString("0:")
-#define SERVER_MSG_PREFIX QString("1:")
+#define CLIENT_MSG_PREFIX QByteArray("0:")
+#define SERVER_MSG_PREFIX QByteArray("1:")
 
-#define SMART_LAYER_SEND_MSG_PREFIX QString("0:")
-#define SMART_LAYER_NEXT_MSG_PREFIX QString("1:")
-#define SMART_LAYER_SEND_MSG_END QString("|")
-#define SMART_LAYER_SEND_MSG_NOT_END QString("_")
+#define SMART_LAYER_SEND_MSG_PREFIX QByteArray("0:")
+#define SMART_LAYER_NEXT_MSG_PREFIX QByteArray("1:")
+#define SMART_LAYER_SEND_MSG_END QByteArray("|")
+#define SMART_LAYER_SEND_MSG_NOT_END QByteArray("_")
 
 #define MAXIMUM_MSG_SIZE  1024*16
 

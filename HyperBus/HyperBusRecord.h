@@ -19,8 +19,7 @@
 #ifndef HYPERBUSRECORD_H
 #define HYPERBUSRECORD_H
 
-#include <QString>
-#include <QStringList>
+#include <QByteArray>
 #include <QList>
 #include <cstdio>
 
@@ -28,26 +27,26 @@ class HyperBusRecord
 {
 public:
     HyperBusRecord();
-    HyperBusRecord( const QString & record );
+    HyperBusRecord( const QByteArray & record );
 
     void operator<<( HyperBusRecord record );
-    void operator<<( const QString & str );
-    void operator<<( const QStringList & list );
+    void operator<<( const QByteArray & str );
+    void operator<<( const QList<QByteArray> & list );
 
-    QString operator[]( int index );
-    QString at( int index );
-    QString last();
-    QString first();
-    QString takeLast();
-    QString takeFirst();
-    QStringList mid( int i , int len );
-    QStringList toQStringList();
+    QByteArray operator[]( int index );
+    QByteArray at( int index );
+    QByteArray last();
+    QByteArray first();
+    QByteArray takeLast();
+    QByteArray takeFirst();
+    QList<QByteArray> mid( int i , int len );
+    QList<QByteArray> toQByteArrayList();
 
     void removeAt( int index );
-    QString takeAt( int index );
+    QByteArray takeAt( int index );
 
-    void FromQString( const QString & str );
-    QString toQSting();
+    void FromQByteArray( const QByteArray & str );
+    QByteArray toQByteArray();
 
     int count();
     int size();
@@ -56,10 +55,10 @@ public:
     void clear();
 
 private:
-    QStringList list;
+    QList<QByteArray> list;
     QList<int> offsets;
 
-    QString strToRecord( const QString & str );
+    QByteArray strToRecord( const QByteArray & str );
 };
 
 #endif // HYPERBUSRECORD_H

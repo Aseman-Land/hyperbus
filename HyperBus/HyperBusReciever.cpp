@@ -83,15 +83,15 @@ QString HyperBusReciever::session() const
 void HyperBusReciever::setServicePermission(const QString &service, HyperBusGlobals::PermissionUserType user)
 {
     const QString & key = QString("/") + p->session + HighWay::makeKeyAbsolute(service);
-    sendCommand( "setServicePermission", QStringList()
-                                   << key
-                                   << QString::number(static_cast<int>(user)) );
+    sendCommand( "setServicePermission", QList<QByteArray>()
+                                   << key.toUtf8()
+                                   << QString::number(static_cast<int>(user)).toUtf8() );
 }
 
 HyperBusGlobals::PermissionUserType HyperBusReciever::servicePermission(const QString &service)
 {
     const QString & key = QString("/") + p->session + HighWay::makeKeyAbsolute(service);
-    QString res_str = sendCommand( "servicePermission", QStringList()<< key );
+    QString res_str = sendCommand( "servicePermission", QList<QByteArray>()<< key.toUtf8() );
 
     return static_cast<HyperBusGlobals::PermissionUserType>(res_str.toInt());
 }
@@ -99,25 +99,25 @@ HyperBusGlobals::PermissionUserType HyperBusReciever::servicePermission(const QS
 void HyperBusReciever::addPidToFirewall(const QString &service, const QString &exe_path)
 {
     const QString & key = QString("/") + p->session + HighWay::makeKeyAbsolute(service);
-    sendCommand( "addPidToFirewall", QStringList()
-                                   << key
-                                   << exe_path );
+    sendCommand( "addPidToFirewall", QList<QByteArray>()
+                                   << key.toUtf8()
+                                   << exe_path.toUtf8() );
 }
 
 void HyperBusReciever::removePidFromFirewall(const QString &service, const QString &exe_path)
 {
     const QString & key = QString("/") + p->session + HighWay::makeKeyAbsolute(service);
-    sendCommand( "removePidFromFirewall", QStringList()
-                                   << key
-                                   << exe_path );
+    sendCommand( "removePidFromFirewall", QList<QByteArray>()
+                                   << key.toUtf8()
+                                   << exe_path.toUtf8() );
 }
 
 bool HyperBusReciever::firewallContaintsPid(const QString &service, const QString &exe_path)
 {
     const QString & key = QString("/") + p->session + HighWay::makeKeyAbsolute(service);
-    QString res_str = sendCommand( "firewallContaintsPid", QStringList()
-                                   << key
-                                   << exe_path );
+    QString res_str = sendCommand( "firewallContaintsPid", QList<QByteArray>()
+                                   << key.toUtf8()
+                                   << exe_path.toUtf8() );
 
     return res_str.toInt();
 }
@@ -125,26 +125,26 @@ bool HyperBusReciever::firewallContaintsPid(const QString &service, const QStrin
 void HyperBusReciever::setFireWallMode(const QString &service, HyperBusGlobals::FireWallMode mode)
 {
     const QString & key = QString("/") + p->session + HighWay::makeKeyAbsolute(service);
-    sendCommand( "setFireWallMode", QStringList()
-                                   << key
-                                   << QString::number(static_cast<int>(mode)) );
+    sendCommand( "setFireWallMode", QList<QByteArray>()
+                                   << key.toUtf8()
+                                   << QString::number(static_cast<int>(mode)).toUtf8() );
 }
 
 HyperBusGlobals::FireWallMode HyperBusReciever::fireWallMode(const QString &service)
 {
     const QString & key = QString("/") + p->session + HighWay::makeKeyAbsolute(service);
-    QString res_str = sendCommand( "fireWallMode", QStringList()
-                                    << key );
+    QString res_str = sendCommand( "fireWallMode", QList<QByteArray>()
+                                    << key.toUtf8() );
 
     return static_cast<HyperBusGlobals::FireWallMode>(res_str.toInt());
 }
 
-QString HyperBusReciever::sendCommand(const QString &commandName, const QStringList &args)
+QByteArray HyperBusReciever::sendCommand(const QString &commandName, const QList<QByteArray> &args)
 {
     HyperBusRecord record;
-    record << commandName;
+    record << commandName.toUtf8();
     record << args;
-    return HMsgTransporter::transfare( record.toQSting() );
+    return HMsgTransporter::transfare( record.toQByteArray() );
 }
 
 QVariant HyperBusReciever::call(const QString &k, const QVariant &val0, const QVariant &val1, const QVariant &val2, const QVariant &val3, const QVariant &val4, const QVariant &val5, const QVariant &val6, const QVariant &val7, const QVariant &val8, const QVariant &val9)
@@ -153,7 +153,7 @@ QVariant HyperBusReciever::call(const QString &k, const QVariant &val0, const QV
     QVariantList vars;
         vars << val0 << val1 << val2 << val3 << val4 << val5 << val6 << val7 << val8 << val9;
 
-    QStringList args;
+    QList<QByteArray> args;
     foreach( const QVariant & var, vars )
     {
         if( var.isNull() )
@@ -162,7 +162,7 @@ QVariant HyperBusReciever::call(const QString &k, const QVariant &val0, const QV
         args << HVariantConverter::encode(var);
     }
 
-    QString res = sendCommand( key, args );
+    QByteArray res = sendCommand( key, args );
     return HVariantConverter::decode(res);
 }
 
@@ -194,11 +194,11 @@ bool HyperBusReciever::registerService(const QString &k, QObject *obj, const cha
         break;
     }
 
-    QString res_str = sendCommand( cmd, QStringList()
-                                   << key
-                                   << QString::number(p->last_map_id)
-                                   << p->highway->returnTypeOf(key)
-                                   << HVariantConverter::encode(QVariant::fromValue<HighWayArgs>(p->highway->paramatersOf(key))) );
+    QByteArray res_str = sendCommand( cmd, QList<QByteArray>()
+                                   << key.toUtf8()
+                                   << QByteArray::number(p->last_map_id)
+                                   << p->highway->returnTypeOf(key).toUtf8()
+                                   << HVariantConverter::encode( QVariant::fromValue<HighWayArgs>(p->highway->paramatersOf(key))) );
 
     p->last_map_id++;
     return res_str.toInt();
@@ -209,15 +209,15 @@ quint64 HyperBusReciever::lastPID() const
     return p->last_pid;
 }
 
-QString HyperBusReciever::callMessage(const QString &msg)
+QByteArray HyperBusReciever::callMessage(const QByteArray &msg)
 {
     HyperBusRecord msg_record( msg );
     if( msg_record.count() == 0 )
-        return QString();
+        return QByteArray();
 
     quint64 map_id = msg_record.takeFirst().toULongLong();
     if( !p->key_maps.contains(map_id) )
-        return QString();
+        return QByteArray();
 
     QVariantList vals;
     for( int i=0; i<10; i++ )
@@ -234,19 +234,19 @@ QString HyperBusReciever::callMessage(const QString &msg)
     return HVariantConverter::encode(res_var);
 }
 
-QString HyperBusReciever::messageEvent(const QString &msg)
+QByteArray HyperBusReciever::messageEvent(const QByteArray &msg)
 {
     int index = msg.indexOf(":");
     if( index == -1 )
-        return QString();
+        return QByteArray();
 
-    QString msg_prv = msg.mid(index+1);
+    QByteArray msg_prv = msg.mid(index+1);
     HyperBusRecord msg_record( msg_prv );
     if( msg_record.count() == 0 )
-        return QString();
+        return QByteArray();
 
     p->last_pid = msg_record.takeFirst().toULongLong();
-    QString res = callMessage(msg_record.toQSting());
+    QByteArray res = callMessage(msg_record.toQByteArray());
 
     return msg.mid(0,index+1)+res;
 }
