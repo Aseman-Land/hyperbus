@@ -3,9 +3,9 @@ QT += gui
 QT += network
 
 DEFINES += HYPERBUS_LIBRARY
-TARGET = HyperBus
 TEMPLATE = lib
 DESTDIR = ../build
+TARGET = HyperBus
 
 DEFINES += GUI_SUPPORT
 greaterThan(QT_MAJOR_VERSION, 4): DEFINES += QT5_BUILD
@@ -50,3 +50,21 @@ SOURCES += \
     HSmartTcpServer.cpp \
     HPidTools.cpp \
     HyperBusTools.cpp
+
+isEmpty(PREFIX) {
+    PREFIX = /usr
+}
+
+contains(QMAKE_HOST.arch, x86):{
+    LIBS_PATH = lib/i386-linux-gnu/
+}
+contains(QMAKE_HOST.arch, x86_64):{
+    LIBS_PATH = lib/x86_64-linux-gnu/
+}
+
+target = $$TARGET
+target.path = $$PREFIX/$$LIBS_PATH
+headers.files = $$HEADERS
+headers.path = $$PREFIX/include/hyperbus
+
+INSTALLS += target headers
