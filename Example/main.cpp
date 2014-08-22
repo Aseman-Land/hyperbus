@@ -1,3 +1,21 @@
+/*
+    Copyright (C) 2014 Sialan Labs
+    http://labs.sialan.org
+
+    HyperBus is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    HyperBus is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <QApplication>
 #include "myobject.h"
 
@@ -12,6 +30,7 @@
 #include <QTest>
 #include <QThread>
 #include <QLabel>
+#include <QProgressBar>
 #include <QLineEdit>
 #include <QSlider>
 #include <QVBoxLayout>
@@ -34,17 +53,25 @@ int main(int argc, char *argv[])
 
     QSlider *sldr = new QSlider();
     sldr->setOrientation(Qt::Horizontal);
+    sldr->setMinimum(0);
+    sldr->setMaximum(100);
+
+    QProgressBar *pbar = new QProgressBar();
+    pbar->setValue(100);
 
     QWidget main;
     QVBoxLayout *layout = new QVBoxLayout(&main);
     layout->addWidget(line);
     layout->addWidget(sldr);
+    layout->addWidget(pbar);
     layout->setContentsMargins(1,1,1,1);
     layout->setSpacing(1);
     main.show();
 
     QObject::connect( line, SIGNAL(textChanged(QString)), myobj, SLOT(setText(QString)) );
     QObject::connect( sldr, SIGNAL(valueChanged(int)), myobj, SLOT(setValue(int)) );
+
+    reciever.registerService( "/setValue2" + append_txt, pbar, SLOT(setValue(int)), "test", HyperBusReciever::Global );
 
     return app.exec();
 

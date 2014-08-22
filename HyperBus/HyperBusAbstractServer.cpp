@@ -3,16 +3,16 @@
     http://labs.sialan.org
 
     HyperBus is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
+    it under the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
     HyperBus is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    GNU Lesser General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
+    You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
@@ -63,7 +63,7 @@ HyperBusAbstractServer::HyperBusAbstractServer(const QString &address, quint32 p
     p->last_id = 0;
 
     p->server = new HSmartTcpServer( this );
-        p->server->openSession(address,port);
+    p->server->openSession(address,port);
 
     connect( p->server, SIGNAL(messageRecieved(QTcpSocket*,QByteArray)), SLOT(messageRecieved(QTcpSocket*,QByteArray)) );
 }
@@ -210,17 +210,17 @@ void HyperBusAbstractServer::readCall(QTcpSocket *socket, const QByteArray &msg)
         record << arg;
 
     HyperBusSendMessageItem send_item;
-        send_item.socket  = service->socket;
-        send_item.caller  = socket;
-        send_item.message = SERVER_MSG_PREFIX + QByteArray::number(p->last_id) + ":" + record.toQByteArray();
+    send_item.socket  = service->socket;
+    send_item.caller  = socket;
+    send_item.message = SERVER_MSG_PREFIX + QByteArray::number(p->last_id) + ":" + record.toQByteArray();
 
     p->send_queues[send_item.socket].append( send_item );
     if( p->send_queues[send_item.socket].count() == 1 )
         p->server->sendMessage( send_item.socket, send_item.message );
 
     QPair<QTcpSocket*,QTcpSocket*> pair;
-        pair.first = socket;
-        pair.second = service->socket;
+    pair.first = socket;
+    pair.second = service->socket;
 
     p->pending_calls.insert( p->last_id, pair );
     p->last_id++;
