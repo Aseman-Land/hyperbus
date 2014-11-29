@@ -1,0 +1,17 @@
+hyperbus (0.5.0ubuntu3) trusty; urgency=medium
+
+  * Fix bug on install rule on make file.
+
+ -- Aseman <contact@aseman.org>  Mon, 06 Oct 2014 21:30:16 +0330
+
+hyperbus (0.5.0ubuntu2) trusty; urgency=medium
+
+  * Fix mistake on i386 file paths.
+
+ -- Aseman <contact@aseman.org>  Mon, 06 Oct 2014 21:23:25 +0330
+
+hyperbus (0.5.0ubuntu1) trusty; urgency=medium
+
+  * Initial Release.
+
+ -- Aseman <contact@aseman.org>  Sun, 05 Oct 2014 14:16:45 +0330

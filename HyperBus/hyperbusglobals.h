@@ -16,26 +16,28 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QCoreApplication>
-#include "myserver.h"
+#ifndef HYPERBUSGLOBALS_H
+#define HYPERBUSGLOBALS_H
 
-#include <hyperbusserver.h>
-#include <htcpserver.h>
+#include <QString>
 
-#include <QUuid>
-#include <QTime>
-#include <QStringList>
-#include <QDebug>
-
-int main(int argc, char *argv[])
+class HyperBusGlobals
 {
-    QCoreApplication app(argc, argv);
+public:
+    enum PermissionUserType{
+        Owner,          //! Just owner process can call service
+        CurrentUser,    //! Every process executed on current user, can call service
+        LocalUsers,     //! Users on the current operating system can call service
+        PublicUsers     //! Everyone can call service
+    };
 
-    QString ip_txt = "127.0.0.1:25480";
-    if( app.arguments().count() > 1 )
-        ip_txt = app.arguments().at(1);
+    enum FireWallMode{
+        BlackList,
+        WhiteList,
+        Disable
+    };
 
-    QStringList splits = ip_txt.split(":");
-    MyServer server(splits.at(0),splits.at(1).toInt());
-    return app.exec();
-}
+    static void nsleep( quint64 ns );
+};
+
+#endif // HYPERBUSGLOBALS_H

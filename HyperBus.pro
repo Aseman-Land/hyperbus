@@ -1,7 +1,11 @@
 TEMPLATE = subdirs
 CONFIG += ordered
-SUBDIRS =  \
+SUBDIRS +=  \
     HyperBus \
-    HyperBusD \
-    Example \
-    Example2
+    HyperBusD
+
+contains(EXNTESIONS,examples) {
+    SUBDIRS +=  \
+        Example \
+        Example2
+}

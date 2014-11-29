@@ -3,7 +3,7 @@ QT += widgets
 QT += testlib
 
 LIBS += -L ../build
-LIBS += -lHyperBus
+LIBS += -lhyperbus
 
 TARGET = Example2
 TEMPLATE = app

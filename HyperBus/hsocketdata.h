@@ -16,26 +16,46 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QCoreApplication>
-#include "myserver.h"
+#ifndef HSOCKETDATA_H
+#define HSOCKETDATA_H
 
-#include <hyperbusserver.h>
-#include <htcpserver.h>
+#include <QHash>
 
-#include <QUuid>
-#include <QTime>
-#include <QStringList>
-#include <QDebug>
-
-int main(int argc, char *argv[])
+class QTcpSocket;
+class HSocketData
 {
-    QCoreApplication app(argc, argv);
+public:
+    HSocketData( QTcpSocket *socket );
+    ~HSocketData();
 
-    QString ip_txt = "127.0.0.1:25480";
-    if( app.arguments().count() > 1 )
-        ip_txt = app.arguments().at(1);
+    enum Protocol{
+        IPv4,
+        IPv6
+    };
 
-    QStringList splits = ip_txt.split(":");
-    MyServer server(splits.at(0),splits.at(1).toInt());
-    return app.exec();
-}
+    enum Type{
+        Established,
+        Listener
+    };
+
+    void refresh();
+
+    QString command() const;
+    QString commandPath() const;
+    quint64 pid() const;
+    QString userName() const;
+    QString fd() const;
+    Protocol protocol() const;
+    quint64 device() const;
+    QString size() const;
+    QString node() const;
+    QString address() const;
+    Type type() const;
+
+
+private:
+    QTcpSocket *socket;
+    QHash<QString,QString> data;
+};
+
+#endif // HSOCKETDATA_H

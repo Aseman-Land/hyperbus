@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2014 Sialan Labs
-    http://labs.sialan.org
+    Copyright (C) 2014 Aseman
+    http://aseman.co
 
     HyperBus is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
@@ -78,7 +78,7 @@ QString MyServer::inout_string_call(const QString &)
     return QString();
 }
 
-bool MyServer::reservedCall(QTcpSocket *socket, const QString &key, const QList<QByteArray> &args, QByteArray *res)
+bool MyServer::reservedCall(QTcpSocket *socket, quint64 call_id, const QString &key, const QList<QByteArray> &args, QByteArray *res, bool *call_pause)
 {
-    return HyperBusServer::reservedCall(socket,key,args,res);
+    return HyperBusServer::reservedCall(socket,call_id,key,args,res,call_pause);
 }

@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2014 Sialan Labs
-    http://labs.sialan.org
+    Copyright (C) 2014 Aseman
+    http://aseman.co
 
     HyperBus is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
@@ -24,7 +24,7 @@
 #include <QProgressBar>
 #include <QPointer>
 
-#include <HyperBus.h>
+#include <hyperbus.h>
 
 class TestObject : public QObject
 {

@@ -16,26 +16,34 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QCoreApplication>
-#include "myserver.h"
+#ifndef HSMARTTCPSERVER_H
+#define HSMARTTCPSERVER_H
 
-#include <hyperbusserver.h>
-#include <htcpserver.h>
+#include <QObject>
 
-#include <QUuid>
-#include <QTime>
-#include <QStringList>
-#include <QDebug>
-
-int main(int argc, char *argv[])
+class QTcpSocket;
+class HSmartTcpServerPrivate;
+class HSmartTcpServer : public QObject
 {
-    QCoreApplication app(argc, argv);
+    Q_OBJECT
+public:
+    HSmartTcpServer(QObject *parent = 0);
+    ~HSmartTcpServer();
 
-    QString ip_txt = "127.0.0.1:25480";
-    if( app.arguments().count() > 1 )
-        ip_txt = app.arguments().at(1);
+    quint16 port() const;
 
-    QStringList splits = ip_txt.split(":");
-    MyServer server(splits.at(0),splits.at(1).toInt());
-    return app.exec();
-}
+public slots:
+    bool openSession(const QString & address, quint32 port);
+    void sendMessage(QTcpSocket *socket, const QByteArray &msg);
+
+signals:
+    void messageRecieved(QTcpSocket *socket, const QByteArray & msg);
+
+private slots:
+    void messageRecieved_prev(QTcpSocket *socket, const QByteArray &msg);
+
+private:
+    HSmartTcpServerPrivate *p;
+};
+
+#endif // HSMARTTCPSERVER_H

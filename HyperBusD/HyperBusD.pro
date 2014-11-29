@@ -1,12 +1,12 @@
 QT += core
 
 LIBS += -L ../build
-LIBS += -lHyperBus
+LIBS += -lhyperbus
 
 TEMPLATE = app
 DESTDIR = ../build
 INCLUDEPATH += ../HyperBus
-TARGET = HyperBusD
+TARGET = hyperbusd
 
 SOURCES += \
     main.cpp \

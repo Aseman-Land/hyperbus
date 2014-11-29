@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2014 Sialan Labs
-    http://labs.sialan.org
+    Copyright (C) 2014 Aseman
+    http://aseman.co
 
     HyperBus is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
@@ -20,7 +20,7 @@
 #define MYOBJECT_H
 
 #include <QObject>
-#include <HyperBus.h>
+#include <hyperbus.h>
 
 class MyObjectPrivate;
 class MyObject : public QObject

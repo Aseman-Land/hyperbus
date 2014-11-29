@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2014 Sialan Labs
-    http://labs.sialan.org
+    Copyright (C) 2014 Aseman
+    http://aseman.co
 
     HyperBus is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
@@ -19,9 +19,9 @@
 #include "testobject.h"
 #include <QApplication>
 
-#include <HyperBus.h>
-#include <HMsgTransporter.h>
-#include <HyperBusRecord.h>
+#include <hyperbus.h>
+#include <hmsgtransporter.h>
+#include <hyperbusrecord.h>
 
 #include <QUuid>
 #include <QTime>
@@ -64,6 +64,7 @@ int main(int argc, char *argv[])
     reciever.registerService( "/ping" + append_txt, test, SLOT(ping()), "test", HyperBusReciever::Global );
     reciever.registerService( "/setText" + append_txt, label, SLOT(setText(QString)), "test", HyperBusReciever::Global );
 
+    return app.exec();
     reciever.registerService( "/test0" + append_txt, test, SLOT(void_call()), "test", HyperBusReciever::Global );
     reciever.registerService( "/test1" + append_txt, test, SLOT(in_int_call(int)), "test", HyperBusReciever::Global );
     reciever.registerService( "/test2" + append_txt, test, SLOT(out_int_call()), "test", HyperBusReciever::Global );
