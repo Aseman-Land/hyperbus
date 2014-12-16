@@ -21,8 +21,10 @@
 
 #include <QObject>
 
+#include "hyperbus_global.h"
+
 class HSmartTcpClientPrivate;
-class HSmartTcpClient : public QObject
+class HYPERBUS_EXPORT HSmartTcpClient : public QObject
 {
     Q_OBJECT
 public:

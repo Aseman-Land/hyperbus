@@ -21,8 +21,10 @@
 
 #include <QObject>
 
+#include "hyperbus_global.h"
+
 class HMsgTransporterPrivate;
-class HMsgTransporter : public QObject
+class HYPERBUS_EXPORT HMsgTransporter : public QObject
 {
     friend class HMsgMiddleTransfare_prev;
     Q_OBJECT

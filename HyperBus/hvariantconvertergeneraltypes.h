@@ -20,8 +20,9 @@
 #define HVARIANTCONVERTERGENERALTYPES_H
 
 #include "hvariantconverterunit.h"
+#include "hyperbus_global.h"
 
-class HVariantConverterUnitString: public HVariantConverterUnit
+class HYPERBUS_EXPORT HVariantConverterUnitString: public HVariantConverterUnit
 {
 public:
     QStringList supportedTypes() const;
@@ -29,7 +30,7 @@ public:
     QVariant decode(const QByteArray &str);
 };
 
-class HVariantConverterUnitStringList: public HVariantConverterUnit
+class HYPERBUS_EXPORT HVariantConverterUnitStringList: public HVariantConverterUnit
 {
 public:
     QStringList supportedTypes() const;
@@ -38,7 +39,7 @@ public:
 };
 
 #ifdef GUI_SUPPORT
-class HVariantConverterUnitImage: public HVariantConverterUnit
+class HYPERBUS_EXPORT HVariantConverterUnitImage: public HVariantConverterUnit
 {
 public:
     QStringList supportedTypes() const;
@@ -46,7 +47,7 @@ public:
     QVariant decode(const QByteArray &str);
 };
 
-class HVariantConverterUnitPixmap: public HVariantConverterUnit
+class HYPERBUS_EXPORT HVariantConverterUnitPixmap: public HVariantConverterUnit
 {
 public:
     QStringList supportedTypes() const;
@@ -54,7 +55,7 @@ public:
     QVariant decode(const QByteArray &str);
 };
 
-class HVariantConverterUnitBitmap: public HVariantConverterUnit
+class HYPERBUS_EXPORT HVariantConverterUnitBitmap: public HVariantConverterUnit
 {
 public:
     QStringList supportedTypes() const;
@@ -63,7 +64,7 @@ public:
 };
 #endif
 
-class HVariantConverterUnitFont: public HVariantConverterUnit
+class HYPERBUS_EXPORT HVariantConverterUnitFont: public HVariantConverterUnit
 {
 public:
     QStringList supportedTypes() const;
@@ -71,7 +72,7 @@ public:
     QVariant decode(const QByteArray &str);
 };
 
-class HVariantConverterUnitColor: public HVariantConverterUnit
+class HYPERBUS_EXPORT HVariantConverterUnitColor: public HVariantConverterUnit
 {
 public:
     QStringList supportedTypes() const;
@@ -79,7 +80,7 @@ public:
     QVariant decode(const QByteArray &str);
 };
 
-class HVariantConverterUnitBrush: public HVariantConverterUnit
+class HYPERBUS_EXPORT HVariantConverterUnitBrush: public HVariantConverterUnit
 {
 public:
     QStringList supportedTypes() const;
@@ -87,7 +88,7 @@ public:
     QVariant decode(const QByteArray &str);
 };
 
-class HVariantConverterUnitDate: public HVariantConverterUnit
+class HYPERBUS_EXPORT HVariantConverterUnitDate: public HVariantConverterUnit
 {
 public:
     QStringList supportedTypes() const;
@@ -95,7 +96,7 @@ public:
     QVariant decode(const QByteArray &str);
 };
 
-class HVariantConverterUnitTime: public HVariantConverterUnit
+class HYPERBUS_EXPORT HVariantConverterUnitTime: public HVariantConverterUnit
 {
 public:
     QStringList supportedTypes() const;
@@ -103,7 +104,7 @@ public:
     QVariant decode(const QByteArray &str);
 };
 
-class HVariantConverterUnitDateTime: public HVariantConverterUnit
+class HYPERBUS_EXPORT HVariantConverterUnitDateTime: public HVariantConverterUnit
 {
 public:
     QStringList supportedTypes() const;
@@ -111,7 +112,7 @@ public:
     QVariant decode(const QByteArray &str);
 };
 
-class HVariantConverterUnitSize: public HVariantConverterUnit
+class HYPERBUS_EXPORT HVariantConverterUnitSize: public HVariantConverterUnit
 {
 public:
     QStringList supportedTypes() const;
@@ -119,7 +120,7 @@ public:
     QVariant decode(const QByteArray &str);
 };
 
-class HVariantConverterUnitSizeF: public HVariantConverterUnit
+class HYPERBUS_EXPORT HVariantConverterUnitSizeF: public HVariantConverterUnit
 {
 public:
     QStringList supportedTypes() const;
@@ -127,7 +128,7 @@ public:
     QVariant decode(const QByteArray &str);
 };
 
-class HVariantConverterUnitPoint: public HVariantConverterUnit
+class HYPERBUS_EXPORT HVariantConverterUnitPoint: public HVariantConverterUnit
 {
 public:
     QStringList supportedTypes() const;
@@ -135,7 +136,7 @@ public:
     QVariant decode(const QByteArray &str);
 };
 
-class HVariantConverterUnitPointF: public HVariantConverterUnit
+class HYPERBUS_EXPORT HVariantConverterUnitPointF: public HVariantConverterUnit
 {
 public:
     QStringList supportedTypes() const;
@@ -143,7 +144,7 @@ public:
     QVariant decode(const QByteArray &str);
 };
 
-class HVariantConverterUnitRect: public HVariantConverterUnit
+class HYPERBUS_EXPORT HVariantConverterUnitRect: public HVariantConverterUnit
 {
 public:
     QStringList supportedTypes() const;
@@ -151,7 +152,7 @@ public:
     QVariant decode(const QByteArray &str);
 };
 
-class HVariantConverterUnitRectF: public HVariantConverterUnit
+class HYPERBUS_EXPORT HVariantConverterUnitRectF: public HVariantConverterUnit
 {
 public:
     QStringList supportedTypes() const;
@@ -159,7 +160,7 @@ public:
     QVariant decode(const QByteArray &str);
 };
 
-class HVariantConverterUnitNumber: public HVariantConverterUnit
+class HYPERBUS_EXPORT HVariantConverterUnitNumber: public HVariantConverterUnit
 {
 public:
     QStringList supportedTypes() const;
@@ -167,7 +168,7 @@ public:
     QVariant decode(const QByteArray &str);
 };
 
-class HVariantConverterUnitPairedList: public HVariantConverterUnit
+class HYPERBUS_EXPORT HVariantConverterUnitPairedList: public HVariantConverterUnit
 {
 public:
     HVariantConverterUnitPairedList();

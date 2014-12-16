@@ -26,6 +26,8 @@
 #include <QVariant>
 #include <QStringList>
 
+#include "hyperbus_global.h"
+
 typedef QList< QPair<QString,QString> > HighWayArgs;
 
 /*!
@@ -36,7 +38,7 @@ typedef QList< QPair<QString,QString> > HighWayArgs;
  * Using member of registered objects.
  */
 class HighWayPrivate;
-class HighWay : public QObject
+class HYPERBUS_EXPORT HighWay : public QObject
 {
     Q_OBJECT
 
@@ -44,6 +46,9 @@ class HighWay : public QObject
 public:
     HighWay(QObject *parent = 0);
     ~HighWay();
+
+    static HighWay *staticHighWay(const QString &key, QObject *parent = 0);
+    static void destroyStaticHighWay(const QString &key);
 
     enum Type{
         Invalid,
@@ -61,15 +66,15 @@ public:
     Q_INVOKABLE bool remove( const QString & key , QObject *obj );
 
     Q_INVOKABLE QVariant call( const QString & key , QVariant val0 = QVariant(),
-                                                            QVariant val1 = QVariant(),
-                                                            QVariant val2 = QVariant(),
-                                                            QVariant val3 = QVariant(),
-                                                            QVariant val4 = QVariant(),
-                                                            QVariant val5 = QVariant(),
-                                                            QVariant val6 = QVariant(),
-                                                            QVariant val7 = QVariant(),
-                                                            QVariant val8 = QVariant(),
-                                                            QVariant val9 = QVariant(), bool *ok = 0 );
+                                                     QVariant val1 = QVariant(),
+                                                     QVariant val2 = QVariant(),
+                                                     QVariant val3 = QVariant(),
+                                                     QVariant val4 = QVariant(),
+                                                     QVariant val5 = QVariant(),
+                                                     QVariant val6 = QVariant(),
+                                                     QVariant val7 = QVariant(),
+                                                     QVariant val8 = QVariant(),
+                                                     QVariant val9 = QVariant(), bool *ok = 0 );
 
     Q_INVOKABLE bool connectToSignal( const QString & key , QObject *reciver , const char * member );
 

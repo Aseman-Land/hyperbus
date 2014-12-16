@@ -26,12 +26,13 @@
 #include <QSet>
 
 #include "hyperbusglobals.h"
+#include "hyperbus_global.h"
 
 class HSocketData;
 class HyperBusServiceItem;
 class QTcpSocket;
 class HyperBusAbstractServerPrivate;
-class HyperBusAbstractServer : public QObject
+class HYPERBUS_EXPORT HyperBusAbstractServer : public QObject
 {
     Q_OBJECT
 public:
@@ -64,7 +65,7 @@ private:
     HyperBusAbstractServerPrivate *p;
 };
 
-class HyperBusServiceItem
+class HYPERBUS_EXPORT HyperBusServiceItem
 {
 public:
     HyperBusServiceItem(){

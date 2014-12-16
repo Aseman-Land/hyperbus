@@ -8,9 +8,7 @@ DESTDIR= \
     ../build
 
 TARGET = hyperbus
-
 DEFINES += GUI_SUPPORT
-greaterThan(QT_MAJOR_VERSION, 4): DEFINES += QT5_BUILD
 
 HEADERS += \
     hyperbus_macros.h \
@@ -53,20 +51,55 @@ SOURCES += \
     hpidtools.cpp \
     hyperbustools.cpp
 
+FRAMEWORKS_HEADERS += \
+    HighWay \
+    HMshTransporter \
+    HPidTools \
+    HSmartTcpClient \
+    HSmartTcpServer \
+    HSocketData \
+    HTcpClient \
+    HTcpServer \
+    HVariantConverter \
+    HVariantConverterGeneralTypes \
+    HVariantConverterUnit \
+    HyperBus \
+    HyperBus_global \
+    HyperBus_macros \
+    HyperBusAbstractServer \
+    HyperBusGlobals \
+    HyperBusReciever \
+    HyperBusRecord \
+    HyperBusServer \
+    HyperBusTools
+
+headers.source = $$HEADERS
+headers.target = $$DESTDIR/include/hyperbus
+fwheaders.source = $$FRAMEWORKS_HEADERS
+fwheaders.target = $$DESTDIR/include/hyperbus
+COPYFOLDERS += headers fwheaders
+
+include(qmake/copyData.pri)
+copyData()
+
 isEmpty(PREFIX) {
     PREFIX = /usr
 }
 
-contains(QMAKE_HOST.arch, x86_64):{
-    LIBS_PATH = lib/x86_64-linux-gnu/
+contains(BUILD_MODE, opt):{
 } else {
-    LIBS_PATH = lib/i386-linux-gnu/
+    contains(QMAKE_HOST.arch, x86_64):{
+        LIBS_PATH = lib/x86_64-linux-gnu/
+    } else {
+        LIBS_PATH = lib/i386-linux-gnu/
+    }
 }
 
 target = $$TARGET
 target.path = $$PREFIX/$$LIBS_PATH
 headers.files = $$HEADERS
 headers.path = $$PREFIX/include/hyperbus
+fwheaders.files = $$FRAMEWORKS_HEADERS
+fwheaders.path = $$PREFIX/include/hyperbus
 
-INSTALLS += target headers
-
+INSTALLS += target headers fwheaders

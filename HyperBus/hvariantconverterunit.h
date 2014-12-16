@@ -23,7 +23,9 @@
 #include <QString>
 #include <QStringList>
 
-class HVariantConverterUnit
+#include "hyperbus_global.h"
+
+class HYPERBUS_EXPORT HVariantConverterUnit
 {
 public:
     virtual QStringList supportedTypes() const = 0;

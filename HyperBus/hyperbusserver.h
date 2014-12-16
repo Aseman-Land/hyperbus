@@ -21,9 +21,10 @@
 
 #include "hyperbusabstractserver.h"
 #include "hyperbusglobals.h"
+#include "hyperbus_global.h"
 
 class HyperBusServerPrivate;
-class HyperBusServer : public HyperBusAbstractServer
+class HYPERBUS_EXPORT HyperBusServer : public HyperBusAbstractServer
 {
     Q_OBJECT
 public:

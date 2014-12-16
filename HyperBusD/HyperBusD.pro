@@ -18,8 +18,13 @@ HEADERS += \
 isEmpty(PREFIX) {
     PREFIX = /usr
 }
+contains(BUILD_MODE, opt):{
+    BIN_PATH = $$PREFIX/
+} else {
+    BIN_PATH = $$PREFIX/bin
+}
 
 target = $$TARGET
-target.path = $$PREFIX/bin
+target.path = $$BIN_PATH
 
 INSTALLS += target

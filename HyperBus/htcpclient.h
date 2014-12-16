@@ -21,8 +21,10 @@
 
 #include <QObject>
 
+#include "hyperbus_global.h"
+
 class HTcpClientPrivate;
-class HTcpClient : public QObject
+class HYPERBUS_EXPORT HTcpClient : public QObject
 {
     Q_OBJECT
 

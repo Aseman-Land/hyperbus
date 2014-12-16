@@ -23,7 +23,9 @@
 #include <QList>
 #include <cstdio>
 
-class HyperBusRecord
+#include "hyperbus_global.h"
+
+class HYPERBUS_EXPORT HyperBusRecord
 {
 public:
     HyperBusRecord();

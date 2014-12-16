@@ -21,8 +21,10 @@
 
 #include <QHash>
 
+#include "hyperbus_global.h"
+
 class QTcpSocket;
-class HSocketData
+class HYPERBUS_EXPORT HSocketData
 {
 public:
     HSocketData( QTcpSocket *socket );

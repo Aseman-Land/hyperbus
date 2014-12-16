@@ -2,7 +2,8 @@ TEMPLATE = subdirs
 CONFIG += ordered
 SUBDIRS +=  \
     HyperBus \
-    HyperBusD
+    HyperBusD \
+    HyperBusQml
 
 contains(EXNTESIONS,examples) {
     SUBDIRS +=  \

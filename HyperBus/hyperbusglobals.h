@@ -21,7 +21,9 @@
 
 #include <QString>
 
-class HyperBusGlobals
+#include "hyperbus_global.h"
+
+class HYPERBUS_EXPORT HyperBusGlobals
 {
 public:
     enum PermissionUserType{

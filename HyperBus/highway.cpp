@@ -88,14 +88,6 @@
         } \
     key.remove( key.size()-1 , 1 ); \
 
-#ifdef QT5_BUILD
-    #define METHOD_SIGNATURE methodSignature
-#else
-    #define METHOD_SIGNATURE signature
-#endif
-
-
-
 #include "highway.h"
 
 #include <QGenericArgument>
@@ -120,6 +112,8 @@ public:
 
 
 
+QHash<QString, HighWay*> static_highway_objs;
+
 class HighWayPrivate
 {
 public:
@@ -137,6 +131,27 @@ HighWay::HighWay(QObject *parent) :
     p->hw_call_counter = 0;
 }
 
+HighWay *HighWay::staticHighWay(const QString &key, QObject *parent)
+{
+    HighWay *res = static_highway_objs.value(key);
+    if(res)
+        return res;
+
+    res = new HighWay(parent);
+    static_highway_objs[key] = res;
+    return res;
+}
+
+void HighWay::destroyStaticHighWay(const QString &key)
+{
+    HighWay *res = static_highway_objs.value(key);
+    if(!res)
+        return;
+
+    static_highway_objs.remove(key);
+    delete res;
+}
+
 void HighWay::registerAllMethods(const QString &parent_key, QObject *obj)
 {
     const QMetaObject *meta_obj = obj->metaObject();
@@ -146,13 +161,13 @@ void HighWay::registerAllMethods(const QString &parent_key, QObject *obj)
         if( meta_method.access() == QMetaMethod::Private )
             continue;
 
-        QString key = parent_key + "/" + QString(meta_method.METHOD_SIGNATURE()).split("(").first() + "/";
+        QString key = parent_key + "/" + QString(meta_method.methodSignature()).split("(").first() + "/";
         HIGHWAY_MAKE_KEY_ABSOLUTE( key )
 
         if( p->hw_items.contains(key) && p->hw_items.value(key)->args.count() != meta_method.parameterNames().count() )
             key += QString::number( meta_method.parameterNames().count() );
 
-        QString member = meta_method.METHOD_SIGNATURE();
+        QString member = meta_method.methodSignature();
         switch( static_cast<int>(meta_method.methodType()) )
         {
         case QMetaMethod::Method:
@@ -190,13 +205,13 @@ bool HighWay::registerFromName(const QString & k, QObject *obj, const QString & 
     for( int i=0 ; i<meta_obj->methodCount() ; i++ )
     {
         QMetaMethod meta_method = meta_obj->method(i);
-        if( QString(meta_method.METHOD_SIGNATURE()).left( method.size()+1 ) != method + "(" )
+        if( QString(meta_method.methodSignature()).left( method.size()+1 ) != method + "(" )
             continue;
 
         if( meta_method.access() == QMetaMethod::Private )
             return false;
 
-        QString member = meta_method.METHOD_SIGNATURE();
+        QString member = meta_method.methodSignature();
         switch( static_cast<int>(meta_method.methodType()) )
         {
         case QMetaMethod::Method:
@@ -316,7 +331,7 @@ bool HighWay::remove(const QString &k, QObject *obj)
     for( int i=0 ; i<meta_obj->methodCount() ; i++ )
     {
         QMetaMethod mm = meta_obj->method(i);
-        if( QString(mm.METHOD_SIGNATURE()).left( item->member.size()+1 ) == item->member+"(" )
+        if( QString(mm.methodSignature()).left( item->member.size()+1 ) == item->member+"(" )
         {
             meta_method = mm;
             break;
@@ -329,7 +344,7 @@ bool HighWay::remove(const QString &k, QObject *obj)
         break;
 
     case HighWay::Signal:
-        QObject::disconnect( item->obj , QString(QString::number(QSIGNAL_CODE) + meta_method.METHOD_SIGNATURE()).toLatin1() , 0 , 0 );
+        QObject::disconnect( item->obj , QString(QString::number(QSIGNAL_CODE) + meta_method.methodSignature()).toLatin1() , 0 , 0 );
         break;
 
     case HighWay::Property:
@@ -394,11 +409,7 @@ QVariant HighWay::call(const QString &k, QVariant val0, QVariant val1, QVariant 
     }
 
     int type = QMetaType::type(item->ret_type.toLatin1());
-#ifdef QT5_BUILD
     void *res = QMetaType::create( type );
-#else
-    void *res = QMetaType::construct( type );
-#endif
     bool is_pointer = item->ret_type.contains('*');
 
     p->hw_last_called_key = key;
@@ -451,14 +462,14 @@ bool HighWay::connectToSignal(const QString &k, QObject *reciver, const char *me
     for( int i=0 ; i<meta_obj->methodCount() ; i++ )
     {
         QMetaMethod mm = meta_obj->method(i);
-        if( QString(mm.METHOD_SIGNATURE()).left( item->member.size()+1 ) == item->member+"(" )
+        if( QString(mm.methodSignature()).left( item->member.size()+1 ) == item->member+"(" )
         {
             meta_method = mm;
             break;
         }
     }
 
-    QObject::connect( item->obj , QString(QString(QString::number(QSIGNAL_CODE)) + meta_method.METHOD_SIGNATURE()).toLatin1() , reciver , member );
+    QObject::connect( item->obj , QString(QString(QString::number(QSIGNAL_CODE)) + meta_method.methodSignature()).toLatin1() , reciver , member );
 
     return true;
 }

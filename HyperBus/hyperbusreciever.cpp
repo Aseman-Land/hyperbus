@@ -37,6 +37,8 @@ public:
     QString session;
 };
 
+QHash<QString, HyperBusReciever*> static_hyperbus_objs;
+
 HyperBusReciever::HyperBusReciever(const QString &address, quint32 port, QObject *parent) :
     HMsgTransporter(address,port,parent)
 {
@@ -46,6 +48,34 @@ HyperBusReciever::HyperBusReciever(const QString &address, quint32 port, QObject
     p->last_pid    = 0;
 
     setSession(HyperBusReciever::Normal);
+}
+
+HyperBusReciever *HyperBusReciever::staticHyperBus(const QString &key, QObject *parent)
+{
+    const int spl_idx = key.lastIndexOf(":");
+    if(spl_idx == -1)
+    {
+        qDebug() << "Bad key: " + key;
+        return 0;
+    }
+    HyperBusReciever *res = static_hyperbus_objs.value(key);
+    if(res)
+        return res;
+
+
+    res = new HyperBusReciever(key.left(spl_idx), key.mid(spl_idx+1).toInt(), parent);
+    static_hyperbus_objs[key] = res;
+    return res;
+}
+
+void HyperBusReciever::destroyStaticHyperBus(const QString &key)
+{
+    HyperBusReciever *res = static_hyperbus_objs.value(key);
+    if(!res)
+        return;
+
+    static_hyperbus_objs.remove(key);
+    delete res;
 }
 
 void HyperBusReciever::setSession(const QString &session)

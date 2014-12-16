@@ -21,10 +21,11 @@
 
 #include "hmsgtransporter.h"
 #include "hyperbusglobals.h"
+#include "hyperbus_global.h"
 #include <QVariant>
 
 class HyperBusRecieverPrivate;
-class HyperBusReciever : public HMsgTransporter
+class HYPERBUS_EXPORT HyperBusReciever : public HMsgTransporter
 {
     Q_OBJECT
 public:
@@ -37,6 +38,10 @@ public:
         Share,
         Local
     };
+
+    /*! Key like: "127.0.0.1:25480" */
+    static HyperBusReciever *staticHyperBus(const QString &key, QObject *parent = 0);
+    static void destroyStaticHyperBus(const QString &key);
 
     void setSession( const QString & session );
     void setSession( SessionType type );

@@ -21,9 +21,11 @@
 
 #include <QObject>
 
+#include "hyperbus_global.h"
+
 class QTcpSocket;
 class HTcpServerPrivate;
-class HTcpServer : public QObject
+class HYPERBUS_EXPORT HTcpServer : public QObject
 {
     Q_OBJECT
 

@@ -20,9 +20,10 @@
 #define HVARIANTCONVERTER_H
 
 #include "hvariantconverterunit.h"
+#include "hyperbus_global.h"
 
 class HVariantConverterUnit;
-class HVariantConverter
+class HYPERBUS_EXPORT HVariantConverter
 {
 public:
     static QByteArray encode( const QVariant & var );

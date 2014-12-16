@@ -21,7 +21,9 @@
 
 #include <QString>
 
-class HPidTools
+#include "hyperbus_global.h"
+
+class HYPERBUS_EXPORT HPidTools
 {
 public:
     static QString userOf( quint64 pid );
