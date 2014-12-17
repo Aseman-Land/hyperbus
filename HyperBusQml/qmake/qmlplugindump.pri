@@ -15,8 +15,10 @@ win32 {
 }
 
 dmpPluginCommand = $(COPY_FILE) $$qmldirSrc $$qmkdirDst
-unix: dmpPluginCommand = $$dmpPluginCommand && $$QMAKE_QMLPLUGINDUMP $$uri 1.0 $$OUT_PWD/$$DESTDIR/.. > $$OUT_PWD/$$DESTDIR/plugins.qmltypes
-unix: dmpPluginCommand = LD_LIBRARY_PATH=$$OUT_PWD/../build && $$dmpPluginCommand
+unix {
+    dmpPluginCommand = $$dmpPluginCommand && LD_LIBRARY_PATH=$$OUT_PWD/../build
+    dmpPluginCommand = $$dmpPluginCommand $$QMAKE_QMLPLUGINDUMP $$uri 1.0 $$OUT_PWD/$$DESTDIR/.. > $$OUT_PWD/$$DESTDIR/plugins.qmltypes
+}
 dmpPluginCommand = @echo Generating plugin types file... && $$dmpPluginCommand
 
 dmpPluginDeploymentfolders.commands = $$dmpPluginCommand
