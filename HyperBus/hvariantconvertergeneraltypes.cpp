@@ -51,6 +51,7 @@
 #include <QBuffer>
 #include <QDataStream>
 
+#ifndef Q_OS_WIN
 bool h_variant_register_default_units();
 bool h_variant_default_units_registered = h_variant_register_default_units();
 
@@ -78,6 +79,7 @@ bool h_variant_register_default_units()
     HVariantConverter::registerConverterUnit( new HVariantConverterUnitPairedList );
     return true;
 }
+#endif
 
 QStringList HVariantConverterUnitString::supportedTypes() const
 {

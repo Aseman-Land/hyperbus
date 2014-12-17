@@ -44,7 +44,6 @@ QFileInfo HyperBusTools::getPidBinaryPath(quint64 pid)
     if( !pQueryFullProcessImageName )
         pQueryFullProcessImageName = (QueryFullProcessImageName) QLibrary::resolve("kernel32", "QueryFullProcessImageNameW");
 
-    quint64 pid = pid;
     DWORD PID = pid; // something here
     HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, false, PID);
 

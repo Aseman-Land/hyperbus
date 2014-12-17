@@ -17,11 +17,16 @@
 */
 
 #include "hyperbusglobals.h"
+#include <QThread>
 
 void HyperBusGlobals::nsleep(quint64 ns)
 {
     timespec req;
     req.tv_sec = ns/1000000000;
     req.tv_nsec = ns%1000000000;
+#ifdef Q_OS_WIN
+    QThread::usleep(ns/1000);
+#else
     nanosleep(&req,0);
+#endif
 }
