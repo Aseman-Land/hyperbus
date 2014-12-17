@@ -1,5 +1,5 @@
 TEMPLATE = lib
-TARGET = HyperBus
+TARGET = HyperBusQml
 QT += qml quick
 CONFIG += qt plugin
 DESTDIR = ../build/qml/HyperBus

@@ -1,2 +1,2 @@
 module HyperBus
-plugin HyperBus
+plugin HyperBusQml
