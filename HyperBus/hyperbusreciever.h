@@ -71,10 +71,9 @@ public:
     bool registerService( const QString & key, QObject *obj, const char *member, const QString & description, SessionType type = Normal );
 
     quint64 lastPID() const;
-
-protected:
     QByteArray sendCommand(const QString &commandName, const QList<QByteArray> &args );
 
+protected:
     virtual QByteArray callMessage(const QByteArray &msg );
     QByteArray messageEvent(const QByteArray &msg );
 

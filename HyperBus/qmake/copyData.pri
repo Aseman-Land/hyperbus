@@ -16,6 +16,7 @@ COPY_MAINPROFILEPWD = $$PWD
 copyCommand =
 for(deploymentfolder, COPYFOLDERS) {
 for(sourceFiles, $${deploymentfolder}.source) {
+    sourceFiles = $$relative_path($$sourceFiles, $$COPY_MAINPROFILEPWD)
     source = $$COPY_MAINPROFILEPWD/$$sourceFiles
     source = $$replace(source, /, \\)
     sourcePathSegments = $$split(source, \\)

@@ -17,7 +17,7 @@ win32 {
 dmpPluginCommand = $(COPY_FILE) $$qmldirSrc $$qmkdirDst
 unix {
     dmpPluginCommand = $$dmpPluginCommand && LD_LIBRARY_PATH=$$OUT_PWD/../build:$$PREFIX
-    dmpPluginCommand = $$dmpPluginCommand $$QMAKE_QMLPLUGINDUMP $$uri 1.0 $$OUT_PWD/$$DESTDIR/.. > $$OUT_PWD/$$DESTDIR/plugins.qmltypes
+    dmpPluginCommand = $$dmpPluginCommand $$QMAKE_QMLPLUGINDUMP  -nonrelocatable $$uri 1.0 $$OUT_PWD/$$DESTDIR/.. > $$OUT_PWD/$$DESTDIR/plugins.qmltypes
 } win32 {
     CONFIG(debug, debug|release) {
     } else {

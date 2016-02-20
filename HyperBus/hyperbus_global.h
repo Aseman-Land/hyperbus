@@ -21,10 +21,12 @@
 
 #include <QtCore/qglobal.h>
 
+#ifndef HYPERBUS_EXPORT
 #if defined(HYPERBUS_LIBRARY)
 #  define HYPERBUS_EXPORT Q_DECL_EXPORT
 #else
 #  define HYPERBUS_EXPORT Q_DECL_IMPORT
+#endif
 #endif
 
 #endif // HYPERBUS_GLOBAL_H
