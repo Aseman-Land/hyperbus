@@ -1,6 +1,6 @@
 QT += core
 
-LIBS += -L ../build
+LIBS += -L../build
 LIBS += -lhyperbus
 
 TEMPLATE = app

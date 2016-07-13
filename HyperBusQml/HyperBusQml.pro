@@ -8,6 +8,7 @@ TARGET = $$qtLibraryTarget($$TARGET)
 uri = HyperBus
 
 INCLUDEPATH += $$OUT_PWD/../build/include/hyperbus
+INCLUDEPATH += ../HyperBus
 
 LIBS += -L../build
 LIBS += -lhyperbus

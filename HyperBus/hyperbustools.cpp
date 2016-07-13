@@ -25,11 +25,13 @@
 #include <QCoreApplication>
 #include <windows.h>
 
+#ifndef Q_CC_MSVC
 typedef BOOL (WINAPI *QueryFullProcessImageName)(HANDLE hProcess,
                                                     DWORD dwFlags,
                                                     LPTSTR lpExeName,
                                                     PDWORD lpdwSize);
 static QueryFullProcessImageName pQueryFullProcessImageName= 0;
+#endif
 #endif
 
 QHash<quint64,QFileInfo> pid_binaries_cache;
@@ -38,6 +40,7 @@ QFileInfo HyperBusTools::getPidBinaryPath(quint64 pid)
 {
     QFileInfo res;
 
+#ifndef Q_CC_MSVC
 #ifndef Q_OS_WIN
     res = QFileInfo( "/proc/" + QString::number(pid) + "/exe" );
 #else
@@ -53,6 +56,7 @@ QFileInfo HyperBusTools::getPidBinaryPath(quint64 pid)
     QString processPath = QString::fromUtf16((ushort*)buffer, value);
 
     res = QFileInfo( processPath.replace("\\","/") );
+#endif
 #endif
 
     return res;

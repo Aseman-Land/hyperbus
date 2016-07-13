@@ -14,9 +14,10 @@ headers.target = $$DESTDIR/include/hyperbus
 fwheaders.source = $$FRAMEWORKS_HEADERS
 fwheaders.target = $$DESTDIR/include/hyperbus
 COPYFOLDERS += headers fwheaders
-
-include(qmake/copyData.pri)
-copyData()
+win32-msvc* {
+        include (qmake/copyData.pri)
+        copyData ()
+    }
 
 isEmpty(PREFIX) {
     PREFIX = /usr
