@@ -27,9 +27,14 @@ isEmpty(PREFIX) {
     PREFIX = /usr
 }
 
-include(qmake/qmlplugindump.pri)
+files.source = plugins.qmltypes qmldir
+files.target = $$DESTDIR
+COPYFOLDERS += files
 
-qmlFile.files = $$OUT_PWD/$$DESTDIR/ qmldir plugins.qmltypes
+include(qmake/copyData.pri)
+copyData()
+
+qmlFile.files = $$OUT_PWD/$$DESTDIR/
 qmlFile.path = $$PREFIX/qml/
 
 INSTALLS += qmlFile
