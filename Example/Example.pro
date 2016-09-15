@@ -7,7 +7,13 @@ LIBS += -lhyperbus
 
 TARGET = Example
 TEMPLATE = app
-DESTDIR = ../build
+
+isEmpty(ASEMAN_BUILD_DEST) {
+    DESTDIR = ../build
+} else {
+    DESTDIR = $$ASEMAN_BUILD_DEST
+}
+
 INCLUDEPATH += ../Diby ../HyperBus
 
 SOURCES += \

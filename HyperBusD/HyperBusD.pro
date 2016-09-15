@@ -1,10 +1,18 @@
 QT += core
 
+TEMPLATE = app
+
+isEmpty(ASEMAN_BUILD_DEST) {
+    DESTDIR = ../build
+} else {
+    DESTDIR = $$ASEMAN_BUILD_DEST
+}
+
+!isEmpty(PREFIX) LIBS += -L$$PREFIX
+!isEmpty(DESTDIR) LIBS += -L$$DESTDIR
 LIBS += -L../build
 LIBS += -lhyperbus
 
-TEMPLATE = app
-DESTDIR = ../build
 INCLUDEPATH += ../HyperBus
 TARGET = hyperbusd
 

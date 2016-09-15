@@ -2,8 +2,12 @@ QT += gui
 
 DEFINES += HYPERBUS_LIBRARY
 TEMPLATE = lib
-DESTDIR= \
-    ../build
+
+isEmpty(ASEMAN_BUILD_DEST) {
+    DESTDIR = ../build
+} else {
+    DESTDIR = $$ASEMAN_BUILD_DEST
+}
 
 TARGET = hyperbus
 
