@@ -29,7 +29,7 @@ isEmpty(PREFIX) {
 
 include(qmake/qmlplugindump.pri)
 
-qmlFile.files = $$OUT_PWD/$$DESTDIR/
+qmlFile.files = $$OUT_PWD/$$DESTDIR/ qmldir plugins.qmltypes
 qmlFile.path = $$PREFIX/qml/
 
 INSTALLS += qmlFile
